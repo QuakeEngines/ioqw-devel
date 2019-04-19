@@ -3509,18 +3509,18 @@ qboolean BotEqualizeTeamScore(bot_state_t *bs) {
 	if (gametype != GT_TEAM) {
 		return qfalse;
 	}
-
-	if (bs->enemyteamscore + bot_equalizer_teambon.value < bs->ownteamscore) { // DEBUG: bot_equalizer_teambon
 #if 0 // DEBUG
+	if (bs->enemyteamscore + bot_equalizer_teambon.value < bs->ownteamscore) { // DEBUG: bot_equalizer_teambon
+
 		if (BotTeam(bs) == TEAM_RED) {
 			BotAI_Print(PRT_MESSAGE, S_COLOR_RED "EQUALIZE for B! (%s) Blue scores: %s, Red scores: %i\n", enemyteamscore, ownteamscore);
 		} else {
 			BotAI_Print(PRT_MESSAGE, S_COLOR_CYAN "EQUALIZE for R! (%s) Blue scores: %s, Red scores: %i\n", enemyteamscore, ownteamscore);
 		}
-#endif // DEBUGEND
+
 		return qtrue;
 	}
-
+#endif // DEBUGEND
 	return qfalse;
 
 }
