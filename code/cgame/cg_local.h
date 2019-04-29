@@ -759,6 +759,7 @@ typedef struct {
 	// flag shaders
 	qhandle_t flagShaders[3];
 	// task shaders
+	qhandle_t roamShader; // Tobias DEBUG
 	qhandle_t patrolShader;
 	qhandle_t assaultShader;
 	qhandle_t campShader;

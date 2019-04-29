@@ -404,7 +404,7 @@ void BotSetTeamStatus(bot_state_t *bs) {
 	int teamtask;
 	aas_entityinfo_t entinfo;
 
-	teamtask = TEAMTASK_PATROL;
+	teamtask = TEAMTASK_NONE; // Tobias DEBUG
 
 	switch (bs->ltgtype) {
 		case LTG_GETFLAG:
@@ -442,18 +442,16 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		case LTG_CAMPORDER:
 			teamtask = TEAMTASK_CAMP;
 			break;
+// Tobias DEBUG
 		case LTG_PATROL:
-			teamtask = TEAMTASK_PATROL;
-			break;
 		case LTG_GETITEM:
-			teamtask = TEAMTASK_PATROL;
-			break;
 		case LTG_KILL:
 			teamtask = TEAMTASK_PATROL;
 			break;
 		default:
-			teamtask = TEAMTASK_PATROL;
+			teamtask = TEAMTASK_NONE; // roaming
 			break;
+// Tobias END
 	}
 
 	BotSetUserInfo(bs, "teamtask", va("%d", teamtask));
