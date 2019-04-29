@@ -461,7 +461,12 @@ qhandle_t CG_StatusHandle(int task) {
 			h = cgs.media.patrolShader;
 			break;
 		default:
-			h = cgs.media.roamShader;
+			if (cg_drawDebug.integer) {
+				h = cgs.media.roamShader;
+			} else {
+				h = cgs.media.patrolShader;
+			}
+
 			break;
 // Tobias END
 	}
