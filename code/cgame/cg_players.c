@@ -1841,7 +1841,7 @@ static void CG_DustTrail(centity_t *cent) {
 	if ((tr.surfaceFlags & SURF_MATERIAL_MASK) != MAT_SAND_GR_COL_01 && (tr.surfaceFlags & SURF_MATERIAL_MASK) != MAT_SAND_GR_COL_02 && (tr.surfaceFlags & SURF_MATERIAL_MASK) != MAT_SAND_GR_COL_03 && (tr.surfaceFlags & SURF_MATERIAL_MASK) != MAT_SAND_GR_COL_04) {
 		return;
 	}
-// Tobias: end
+// Tobias END
 	VectorCopy(cent->currentState.pos.trBase, end);
 
 	end[2] -= 16;
@@ -2175,7 +2175,7 @@ static void CG_PlayerSprites(centity_t *cent, const refEntity_t *parent) {
 
 	clientNum = cent->currentState.clientNum;
 	ci = &cgs.clientinfo[clientNum];
-// Tobias end
+// Tobias END
 	VectorCopy(parent->origin, origin);
 	origin[2] += 42;
 
@@ -2201,7 +2201,7 @@ static void CG_PlayerSprites(centity_t *cent, const refEntity_t *parent) {
 			return;
 		}
 	}
-// Tobias end
+// Tobias END
 	if (cent->currentState.eFlags & EF_CONNECTION) {
 		CG_PlayerFloatSprite(origin, thirdPersonFlags, cgs.media.connectionShader);
 		return;
