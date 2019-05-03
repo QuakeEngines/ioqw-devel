@@ -5153,7 +5153,7 @@ void BotCheckConsoleMessages(bot_state_t *bs) {
 		// if there's no match
 		if (!BotMatchMessage(bs, m.message)) {
 			// if it is a chat message
-			if (m.type == CMS_CHAT && !bot_nochat.integer) {
+			if (m.type == CMS_CHAT/* && !bot_nochat.integer*/) { // Tobias DEBUG
 				if (!trap_BotFindMatch(m.message, &match, MTCONTEXT_REPLYCHAT)) {
 					trap_BotRemoveConsoleMessage(bs->cs, handle);
 					continue;
@@ -5926,7 +5926,7 @@ void BotSetupDeathmatchAI(void) {
 
 	trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "1", 0);
 	trap_Cvar_Register(&bot_fastchat, "bot_fastchat", "0", 0);
-	trap_Cvar_Register(&bot_nochat, "bot_nochat", "0", 0);
+	trap_Cvar_Register(&bot_nochat, "bot_nochat", "1", 0);
 	trap_Cvar_Register(&bot_testrchat, "bot_testrchat", "0", 0);
 	trap_Cvar_Register(&bot_challenge, "bot_challenge", "0", 0);
 	trap_Cvar_Register(&bot_predictobstacles, "bot_predictobstacles", "1", 0);
