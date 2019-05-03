@@ -774,8 +774,9 @@ void SaveRegisteredItems(void) {
 	}
 
 	string[bg_numItems] = 0;
-
+#ifndef BASEGAME // Tobias DEBUG
 	G_Printf("%i items registered\n", count);
+#endif // Tobias END
 	trap_SetConfigstring(CS_ITEMS, string);
 }
 

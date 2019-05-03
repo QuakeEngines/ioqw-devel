@@ -87,8 +87,8 @@ AAS_SetInitialized
 void AAS_SetInitialized(void) {
 
 	aasworld.initialized = qtrue;
-	botimport.Print(PRT_MESSAGE, "AAS initialized.\n");
 #ifndef BASEGAME // Tobias DEBUG
+	botimport.Print(PRT_MESSAGE, "AAS initialized.\n");
 	// create all the routing cache
 	//AAS_CreateAllRoutingCache();
 	//AAS_RoutingInfo();
@@ -227,9 +227,9 @@ int AAS_LoadFiles(const char *mapname) {
 	if (errnum != BLERR_NOERROR) {
 		return errnum;
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", aasfile);
-
+#endif // Tobias END
 	Q_strncpyz(aasworld.filename, aasfile, sizeof(aasworld.filename));
 	return BLERR_NOERROR;
 }
@@ -329,5 +329,7 @@ void AAS_Shutdown(void) {
 	aasworld.initialized = qfalse;
 	// NOTE: as soon as a new .bsp file is loaded the .bsp file memory is freed and reallocated, so there's no need to free that memory here
 	// print shutdown
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "AAS shutdown.\n");
+#endif // Tobias END
 }

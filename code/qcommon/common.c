@@ -1428,8 +1428,9 @@ void Com_TouchMemory(void) {
 	}
 
 	end = Sys_Milliseconds();
-
+#ifndef BASEGAME // Tobias DEBUG
 	Com_Printf("Com_TouchMemory: %i msec\n", end - start);
+#endif // Tobias END
 }
 
 /*
@@ -1714,8 +1715,9 @@ void Hunk_Clear(void) {
 
 	hunk_permanent = &hunk_low;
 	hunk_temp = &hunk_high;
-
+#ifndef BASEGAME // Tobias DEBUG
 	Com_Printf("Hunk_Clear: reset the hunk ok\n");
+#endif // Tobias END
 	VM_Clear();
 #ifdef HUNK_DEBUG
 	hunkblocks = NULL;

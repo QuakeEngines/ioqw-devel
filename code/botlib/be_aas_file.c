@@ -375,8 +375,9 @@ int AAS_LoadAASFile(char *filename) {
 	fileHandle_t fp;
 	aas_header_t header;
 	int offset, length, lastoffset;
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "trying to load %s\n", filename);
+#endif // Tobias END
 	// dump current loaded aas file
 	AAS_DumpAASData();
 	// open the file

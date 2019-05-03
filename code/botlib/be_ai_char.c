@@ -393,7 +393,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(charfile, skill);
 
 		if (cachedhandle) {
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
+#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -404,11 +406,8 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
-		botimport.Print(PRT_MESSAGE, "loaded skill %d from %s\n", intskill, charfile);
 #ifndef BASEGAME // Tobias DEBUG
-		if (botDeveloper) {
-			botimport.Print(PRT_MESSAGE, "skill %d loaded in %d msec from %s\n", intskill, Sys_MilliSeconds() - starttime, charfile);
-		}
+		botimport.Print(PRT_MESSAGE, "loaded skill %d in %d msec from %s\n", intskill, Sys_MilliSeconds() - starttime, charfile);
 #endif // Tobias END
 		return handle;
 	}
@@ -420,7 +419,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(DEFAULT_CHARACTER, skill);
 
 		if (cachedhandle) {
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached default skill %d from %s\n", intskill, charfile);
+#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -429,7 +430,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded default skill %d from %s\n", intskill, charfile);
+#endif // Tobias END
 		return handle;
 	}
 
@@ -438,7 +441,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(charfile, -1);
 
 		if (cachedhandle) {
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
+#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -447,7 +452,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded skill %f from %s\n", ch->skill, charfile);
+#endif // Tobias END
 		return handle;
 	}
 
@@ -456,7 +463,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(DEFAULT_CHARACTER, -1);
 
 		if (cachedhandle) {
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached default skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
+#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -465,11 +474,14 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded default skill %f from %s\n", ch->skill, charfile);
+#endif // Tobias END
 		return handle;
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_WARNING, "couldn't load any skill from %s\n", charfile);
+#endif // Tobias END
 	// couldn't load any character
 	return 0;
 }
@@ -566,7 +578,9 @@ int BotLoadCharacter(char *charfile, float skill) {
 	handle = BotFindCachedCharacter(charfile, skill);
 
 	if (handle) {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
+#endif // Tobias END
 		return handle;
 	}
 
@@ -624,12 +638,16 @@ int CheckCharacteristicIndex(int character, int index) {
 	}
 
 	if (index < 0 || index >= MAX_CHARACTERISTICS) {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d does not exist\n", index);
+#endif // Tobias END
 		return qfalse;
 	}
 
 	if (!ch->c[index].type) {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not initialized\n", index);
+#endif // Tobias END
 		return qfalse;
 	}
 
@@ -661,7 +679,9 @@ float Characteristic_Float(int character, int index) {
 		return ch->c[index].value._float;
 	// cannot convert a string pointer to a float
 	} else {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not a float\n", index);
+#endif // Tobias END
 		return 0;
 	}
 
@@ -684,7 +704,9 @@ float Characteristic_BFloat(int character, int index, float min, float max) {
 	}
 
 	if (min > max) {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "cannot bound characteristic %d between %f and %f\n", index, min, max);
+#endif // Tobias END
 		return 0;
 	}
 
@@ -725,7 +747,9 @@ int Characteristic_Integer(int character, int index) {
 	} else if (ch->c[index].type == CT_FLOAT) {
 		return (int)ch->c[index].value._float;
 	} else {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not an integer\n", index);
+#endif // Tobias END
 		return 0;
 	}
 
@@ -748,7 +772,9 @@ int Characteristic_BInteger(int character, int index, int min, int max) {
 	}
 
 	if (min > max) {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "cannot bound characteristic %d between %d and %d\n", index, min, max);
+#endif // Tobias END
 		return 0;
 	}
 
@@ -787,7 +813,9 @@ void Characteristic_String(int character, int index, char *buf, int size) {
 		strncpy(buf, ch->c[index].value.string, size - 1);
 		buf[size - 1] = '\0';
 	} else {
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not a string\n", index);
+#endif // Tobias END
 	}
 }
 

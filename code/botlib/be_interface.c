@@ -123,13 +123,11 @@ int Export_BotLibSetup(void) {
 	memset(&botlibglobals, 0, sizeof(botlibglobals));
 	// initialize byte swapping (litte endian etc.)
 	//Swap_Init();
-
-	if (botDeveloper) {
-		Log_Open("botlib.log");
-	}
+#ifndef BASEGAME // Tobias DEBUG
+	Log_Open("botlib.log");
 
 	botimport.Print(PRT_MESSAGE, "------- BotLib Initialization -------\n");
-
+#endif // Tobias END
 	botlibglobals.maxclients = (int)LibVarValue("maxclients", "128");
 	botlibglobals.maxentities = (int)LibVarValue("maxentities", "1024");
 
@@ -270,8 +268,9 @@ int Export_BotLibLoadMap(const char *mapname) {
 	if (!BotLibSetup("BotLoadMap")) {
 		return BLERR_LIBRARYNOTSETUP;
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "------------ Map Loading ------------\n");
+#endif // Tobias END
 	// startup AAS for the current map, model and sound index
 	errnum = AAS_LoadMap(mapname);
 
@@ -281,9 +280,8 @@ int Export_BotLibLoadMap(const char *mapname) {
 	// initialize the items in the level
 	BotInitLevelItems();		// be_ai_goal.h
 	BotSetBrushModelTypes();	// be_ai_move.h
-
-	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
 #ifndef BASEGAME // Tobias DEBUG
+	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
 	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", botimport.MilliSeconds() - starttime);
 #endif // Tobias END
 	return BLERR_NOERROR;

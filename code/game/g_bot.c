@@ -181,9 +181,9 @@ static void G_LoadArenas(void) {
 		strcat(filename, dirptr);
 		G_LoadArenasFromFile(filename);
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	trap_Print(va("%i arenas parsed\n", g_numArenas));
-
+#endif // Tobias END
 	for (n = 0; n < g_numArenas; n++) {
 		Info_SetValueForKey(g_arenaInfos[n], "num", va("%i", n));
 	}
@@ -1034,8 +1034,9 @@ static void G_LoadBots(void) {
 		strcat(filename, dirptr);
 		G_LoadBotsFromFile(filename);
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	trap_Print(va("%i bots parsed\n", g_numBots));
+#endif // Tobias END
 }
 
 /*

@@ -2184,9 +2184,9 @@ void CL_ServersResponsePacket(const netadr_t *from, msg_t *msg, qboolean extende
 	int numservers;
 	byte *buffptr;
 	byte *buffend;
-
+#ifndef BASEGAME // Tobias DEBUG
 	Com_Printf("CL_ServersResponsePacket from %s\n", NET_AdrToStringwPort(*from));
-
+#endif // Tobias END
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
 		cls.numglobalservers = 0;

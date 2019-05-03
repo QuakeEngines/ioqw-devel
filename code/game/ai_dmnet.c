@@ -93,7 +93,7 @@ void BotRecordNodeSwitch(bot_state_t *bs, char *node, char *str, char *s) {
 	if (0) {
 		BotAI_Print(PRT_MESSAGE, "%s", nodeswitch[numnodeswitches]);
 	}
-#endif // DEBUG
+#endif // Tobias END
 	numnodeswitches++;
 }
 
@@ -152,8 +152,8 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 	// if the bot needs air
 	if (bs->lastair_time < FloatTime() - 6) {
 #ifndef BASEGAME // Tobias DEBUG
-		//BotAI_Print(PRT_MESSAGE, "going for air\n");
-#endif // DEBUG
+		BotAI_Print(PRT_MESSAGE, "going for air\n");
+#endif // Tobias END
 		// if we can find an air goal
 		if (BotGetAirGoal(bs, &goal)) {
 			trap_BotPushGoal(bs->gs, &goal);
@@ -199,7 +199,7 @@ int BotNearbyGoal(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 	}
 
 	ret = trap_BotChooseNBGItem(bs->gs, bs->origin, bs->inventory, tfl, ltg, range);
-	/*
+#ifndef BASEGAME // Tobias DEBUG
 	if (ret) {
 		char buf[128];
 
@@ -208,7 +208,7 @@ int BotNearbyGoal(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 		trap_BotGoalName(goal.number, buf, sizeof(buf));
 		BotAI_Print(PRT_MESSAGE, "%1.1f: new nearby goal %s\n", FloatTime(), buf);
 	}
-	*/
+#endif // Tobias END
 	return ret;
 }
 
@@ -284,7 +284,9 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
 
 	// if the bot has no goal
 	if (!trap_BotGetTopGoal(bs->gs, goal)) {
-		//BotAI_Print(PRT_MESSAGE, "no ltg on stack\n");
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "no ltg on stack\n");
+#endif // Tobias END
 		bs->ltg_time = 0;
 	// if the bot touches the current goal
 	} else if (BotReachedGoal(bs, goal)) {
@@ -295,26 +297,29 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
 	if (bs->ltg_time < FloatTime()) {
 		// pop the current goal from the stack
 		trap_BotPopGoal(bs->gs);
-		//BotAI_Print(PRT_MESSAGE, "%s: choosing new ltg\n", ClientName(bs->client, netname, sizeof(netname)));
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "%s: choosing new ltg\n", ClientName(bs->client, netname, sizeof(netname)));
 		// choose a new goal
-		//BotAI_Print(PRT_MESSAGE, "%6.1f client %d: BotChooseLTGItem\n", FloatTime(), bs->client);
-
+		BotAI_Print(PRT_MESSAGE, "%6.1f client %d: BotChooseLTGItem\n", FloatTime(), bs->client);
+#endif // Tobias END
 		if (trap_BotChooseLTGItem(bs->gs, bs->origin, bs->inventory, tfl)) {
-			/*
+#ifndef BASEGAME // Tobias DEBUG
 			char buf[128];
 
 			// get the goal at the top of the stack
 			trap_BotGetTopGoal(bs->gs, goal);
 			trap_BotGoalName(goal->number, buf, sizeof(buf));
 			BotAI_Print(PRT_MESSAGE, "%1.1f: new long term goal %s\n", FloatTime(), buf);
-			*/
+#endif // Tobias END
 			bs->ltg_time = FloatTime() + 20;
 		} else { // the bot gets sorta stuck with all the avoid timings, shouldn't happen though
 #ifndef BASEGAME // Tobias DEBUG
 			char netname[128];
 
+			ClientName(bs->client, netname, sizeof(netname));
+
 			BotAI_Print(PRT_MESSAGE, "%s: no valid ltg (probably stuck)\n", ClientName(bs->client, netname, sizeof(netname)));
-#endif
+#endif // Tobias END
 			//trap_BotDumpAvoidGoals(bs->gs);
 			// reset the avoid goals and the avoid reach
 			trap_BotResetAvoidGoals(bs->gs);
@@ -489,10 +494,12 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 				// check if the bot wants to go for air
 				if (BotGoForAir(bs, bs->tfl, &bs->teamgoal, 400)) {
 					trap_BotResetLastAvoidReach(bs->ms);
+#ifndef BASEGAME // Tobias DEBUG
 					// get the goal at the top of the stack
-					//trap_BotGetTopGoal(bs->gs, &tmpgoal);
-					//trap_BotGoalName(tmpgoal.number, buf, 144);
-					//BotAI_Print(PRT_MESSAGE, "new nearby goal %s\n", buf);
+					trap_BotGetTopGoal(bs->gs, &tmpgoal);
+					trap_BotGoalName(tmpgoal.number, buf, 144);
+					BotAI_Print(PRT_MESSAGE, "new nearby goal %s\n", buf);
+#endif // Tobias END
 					// time the bot gets to pick up the nearby goal item
 					bs->nbg_time = FloatTime() + 8;
 					AIEnter_Seek_NBG(bs, "BotLongTermGoal: go for air");
@@ -1615,7 +1622,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 		if (!VectorCompare(bs->activatestack->origin, entinfo.origin)) {
 #ifndef BASEGAME // Tobias DEBUG
 			BotAI_Print(PRT_MESSAGE, "hit shootable button or trigger\n");
-#endif // DEBUG
+#endif // Tobias END
 			bs->activatestack->time = 0;
 		}
 		// if the activate goal has been activated or the bot takes too long
@@ -1642,7 +1649,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 			if (trap_BotTouchingGoal(bs->origin, goal)) {
 #ifndef BASEGAME // Tobias DEBUG
 				BotAI_Print(PRT_MESSAGE, "touched button or trigger\n");
-#endif // DEBUG
+#endif // Tobias END
 				bs->activatestack->time = 0;
 			}
 		}
@@ -1670,7 +1677,9 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 		if (moveresult.failure) {
 			// reset the avoid reach, otherwise bot is stuck in current area
 			trap_BotResetAvoidReach(bs->ms);
-			//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+			BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 			bs->activatestack->time = 0;
 		}
 		// check if the bot is blocked
@@ -1831,7 +1840,9 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->nbg_time = 0;
 	}
 	// check if the bot is blocked
@@ -2006,10 +2017,12 @@ int AINode_Seek_LTG(bot_state_t *bs) {
 
 		if (BotNearbyGoal(bs, bs->tfl, &goal, range)) {
 			trap_BotResetLastAvoidReach(bs->ms);
+#ifndef BASEGAME // Tobias DEBUG
 			// get the goal at the top of the stack
-			//trap_BotGetTopGoal(bs->gs, &tmpgoal);
-			//trap_BotGoalName(tmpgoal.number, buf, 144);
-			//BotAI_Print(PRT_MESSAGE, "new nearby goal %s\n", buf);
+			trap_BotGetTopGoal(bs->gs, &tmpgoal);
+			trap_BotGoalName(tmpgoal.number, buf, 144);
+			BotAI_Print(PRT_MESSAGE, "new nearby goal %s\n", buf);
+#endif // Tobias END
 			// time the bot gets to pick up the nearby goal item
 			bs->nbg_time = FloatTime() + 4 + range * 0.01;
 			AIEnter_Seek_NBG(bs, "ltg seek: nbg");
@@ -2028,7 +2041,9 @@ int AINode_Seek_LTG(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->ltg_time = 0;
 	}
 	// check if the bot is blocked
@@ -2126,7 +2141,7 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	if (BotFindEnemy(bs, bs->enemy)) {
 #ifndef BASEGAME // Tobias DEBUG
 		BotAI_Print(PRT_MESSAGE, "found new better enemy\n");
-#endif
+#endif // Tobias END
 	}
 	// if no enemy
 	if (bs->enemy < 0) {
@@ -2236,7 +2251,9 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->ltg_time = 0;
 	}
 	// check if the bot is blocked
@@ -2364,7 +2381,9 @@ int AINode_Battle_Chase(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->ltg_time = 0;
 	}
 	// check if the bot is blocked
@@ -2457,7 +2476,7 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
 	if (BotFindEnemy(bs, bs->enemy)) {
 #ifndef BASEGAME // Tobias DEBUG
 		BotAI_Print(PRT_MESSAGE, "found new better enemy\n");
-#endif
+#endif // Tobias END
 	}
 
 	bs->tfl = TFL_DEFAULT;
@@ -2553,7 +2572,9 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->ltg_time = 0;
 	}
 	// check if the bot is blocked
@@ -2697,7 +2718,9 @@ int AINode_Battle_NBG(bot_state_t *bs) {
 	if (moveresult.failure) {
 		// reset the avoid reach, otherwise bot is stuck in current area
 		trap_BotResetAvoidReach(bs->ms);
-		//BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#ifndef BASEGAME // Tobias DEBUG
+		BotAI_Print(PRT_MESSAGE, "movement failure %d\n", moveresult.traveltype);
+#endif // Tobias END
 		bs->nbg_time = 0;
 	}
 	// check if the bot is blocked

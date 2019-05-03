@@ -233,7 +233,78 @@ float AngleDiff(float ang1, float ang2) {
 
 	return diff;
 }
+#ifndef BASEGAME // Tobias DEBUG
+/*
+=======================================================================================================================================
+BotPrintTravelType
+=======================================================================================================================================
+*/
+void BotPrintTravelType(int traveltype) {
+	char *str;
 
+	switch (traveltype & TRAVELTYPE_MASK) {
+		case TRAVEL_INVALID:
+			str = "TRAVEL_INVALID";
+			break;
+		case TRAVEL_WALK:
+			str = "TRAVEL_WALK";
+			break;
+		case TRAVEL_CROUCH:
+			str = "TRAVEL_CROUCH";
+			break;
+		case TRAVEL_BARRIERJUMP:
+			str = "TRAVEL_BARRIERJUMP";
+			break;
+		case TRAVEL_JUMP:
+			str = "TRAVEL_JUMP";
+			break;
+		case TRAVEL_LADDER:
+			str = "TRAVEL_LADDER";
+			break;
+		case TRAVEL_WALKOFFLEDGE:
+			str = "TRAVEL_WALKOFFLEDGE";
+			break;
+		case TRAVEL_SWIM:
+			str = "TRAVEL_SWIM";
+			break;
+		case TRAVEL_WATERJUMP:
+			str = "TRAVEL_WATERJUMP";
+			break;
+		case TRAVEL_TELEPORT:
+			str = "TRAVEL_TELEPORT";
+			break;
+		case TRAVEL_ELEVATOR:
+			str = "TRAVEL_ELEVATOR";
+			break;
+		case TRAVEL_ROCKETJUMP:
+			str = "TRAVEL_ROCKETJUMP";
+			break;
+		case TRAVEL_BFGJUMP:
+			str = "TRAVEL_BFGJUMP";
+			break;
+		case TRAVEL_DOUBLEJUMP:
+			str = "TRAVEL_DOUBLEJUMP";
+			break;
+		case TRAVEL_RAMPJUMP:
+			str = "TRAVEL_RAMPJUMP";
+			break;
+		case TRAVEL_STRAFEJUMP:
+			str = "TRAVEL_STRAFEJUMP";
+			break;
+		case TRAVEL_JUMPPAD:
+			str = "TRAVEL_JUMPPAD";
+			break;
+		case TRAVEL_FUNCBOB:
+			str = "TRAVEL_FUNCBOB";
+			break;
+		default:
+			botimport.Print(PRT_MESSAGE, S_COLOR_RED "UNKNOWN TRAVEL TYPE (%d)" S_COLOR_WHITE, (traveltype & TRAVELTYPE_MASK));
+			return;
+	}
+
+	botimport.Print(PRT_MESSAGE, "%s", str);
+}
+#endif // Tobias END
 /*
 =======================================================================================================================================
 BotFuzzyPointReachabilityArea
@@ -831,9 +902,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum, int lastgoalareanum, in
 
 		if (i != MAX_AVOIDREACH && avoidreachtries[i] > AVOIDREACH_TRIES) {
 #ifndef BASEGAME // Tobias DEBUG
-			if (botDeveloper) {
-				botimport.Print(PRT_MESSAGE, "avoiding reachability %d\n", avoidreach[i]);
-			}
+			botimport.Print(PRT_MESSAGE, "avoiding reachability %d\n", avoidreach[i]);
 #endif // Tobias END
 			continue;
 		}
@@ -1416,7 +1485,7 @@ void BotCheckBlocked(bot_movestate_t *ms, vec3_t dir, int checkbottom, bot_mover
 		result->blocked = qtrue;
 		result->blockentity = trace.entityNum;
 #ifndef BASEGAME // Tobias DEBUG
-		//botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
+		botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
 #endif // Tobias END
 	// if not in an area with reachability
 	} else if (checkbottom && !AAS_AreaReachability(ms->areanum)) {
@@ -1430,7 +1499,7 @@ void BotCheckBlocked(bot_movestate_t *ms, vec3_t dir, int checkbottom, bot_mover
 			result->blockentity = trace.entityNum;
 			result->flags |= MOVERESULT_ONTOPOF_OBSTACLE;
 #ifndef BASEGAME // Tobias DEBUG
-			//botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
+			botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
 #endif // Tobias END
 		}
 	}
@@ -2990,9 +3059,11 @@ bot_moveresult_t BotMoveInGoalArea(bot_movestate_t *ms, bot_goal_t *goal) {
 	vec3_t dir;
 	float dist, speed;
 #ifndef BASEGAME // Tobias DEBUG
-	//botimport.Print(PRT_MESSAGE, "%s: moving straight to goal\n", ClientName(ms->entitynum - 1));
-	//AAS_ClearShownDebugLines();
-	//AAS_DebugLine(ms->origin, goal->origin, LINECOLOR_RED);
+	if (botDeveloper) {
+		botimport.Print(PRT_MESSAGE, "%s: moving straight to goal\n", ClientName(ms->entitynum-1));
+		AAS_ClearShownDebugLines();
+		AAS_DebugLine(ms->origin, goal->origin, LINECOLOR_RED);
+	}
 #endif // Tobias END
 	// walk straight to the goal origin
 	dir[0] = goal->origin[0] - ms->origin[0];
@@ -3104,10 +3175,9 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 							ms->lastreachnum = reachnum;
 							ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
 						} else {
-							if (botDeveloper) {
-								botimport.Print(PRT_MESSAGE, "client %d: on func_plat without reachability\n", ms->client);
-							}
-
+#ifndef BASEGAME // Tobias DEBUG
+							botimport.Print(PRT_MESSAGE, "client %d: on func_plat without reachability\n", ms->client);
+#endif // Tobias END
 							result->blocked = qtrue;
 							result->blockentity = ent;
 							result->flags |= MOVERESULT_ONTOPOF_OBSTACLE;
@@ -3128,10 +3198,9 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 							ms->lastreachnum = reachnum;
 							ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
 						} else {
-							if (botDeveloper) {
-								botimport.Print(PRT_MESSAGE, "client %d: on func_bobbing without reachability\n", ms->client);
-							}
-
+#ifndef BASEGAME // Tobias DEBUG
+							botimport.Print(PRT_MESSAGE, "client %d: on func_bobbing without reachability\n", ms->client);
+#endif // Tobias END
 							result->blocked = qtrue;
 							result->blockentity = ent;
 							result->flags |= MOVERESULT_ONTOPOF_OBSTACLE;
@@ -3206,18 +3275,16 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				}
 			} else {
 #ifndef BASEGAME // Tobias DEBUG
-				if (botDeveloper) {
-					if (ms->reachability_time < AAS_Time()) {
-						botimport.Print(PRT_MESSAGE, "client %d: reachability timeout in ", ms->client);
-						AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
-						botimport.Print(PRT_MESSAGE, "\n");
-					}
-					/*
-					if (ms->lastareanum != ms->areanum) {
-						botimport.Print(PRT_MESSAGE, "changed from area %d to %d\n", ms->lastareanum, ms->areanum);
-					}
-					*/
+				if (ms->reachability_time < AAS_Time()) {
+					botimport.Print(PRT_MESSAGE, "client %d: reachability timeout in ", ms->client);
+					BotPrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
+					botimport.Print(PRT_MESSAGE, "\n");
 				}
+				/*
+				if (ms->lastareanum != ms->areanum) {
+					botimport.Print(PRT_MESSAGE, "changed from area %d to %d\n", ms->lastareanum, ms->areanum);
+				}
+				*/
 #endif // Tobias END
 				// if the goal area changed or the reachability timed out or the area changed
 				if (ms->lastgoalareanum != goal->areanum || ms->reachability_time < AAS_Time() || ms->lastareanum != ms->areanum) {
@@ -3233,9 +3300,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			// if the area has no reachability links
 			if (!AAS_AreaReachability(ms->areanum)) {
 #ifndef BASEGAME // Tobias DEBUG
-				if (botDeveloper) {
-					botimport.Print(PRT_MESSAGE, "area %d no reachability\n", ms->areanum);
-				}
+				botimport.Print(PRT_MESSAGE, "area %d no reachability\n", ms->areanum);
 #endif // Tobias END
 			}
 			// get a new reachability leading towards the goal
@@ -3255,17 +3320,14 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 #endif // AVOIDREACH
 			}
 #ifndef BASEGAME // Tobias DEBUG
-			else if (botDeveloper) {
+			else {
 				botimport.Print(PRT_MESSAGE, "goal not reachable\n");
-				Com_Memset(&reach, 0, sizeof(aas_reachability_t)); // make compiler happy
+				//Com_Memset(&reach, 0, sizeof(aas_reachability_t)); // make compiler happy
 			}
-
-			if (botDeveloper) {
-				// if still going for the same goal
-				if (ms->lastgoalareanum == goal->areanum) {
-					if (ms->lastareanum == reach.areanum) {
-						botimport.Print(PRT_MESSAGE, "same goal, going back to previous area\n");
-					}
+			// if still going for the same goal
+			if (ms->lastgoalareanum == goal->areanum) {
+				if (ms->lastareanum == reach.areanum) {
+					botimport.Print(PRT_MESSAGE, "same goal, going back to previous area\n");
 				}
 			}
 #endif // Tobias END
@@ -3281,12 +3343,12 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			result->traveltype = reach.traveltype;
 #ifndef BASEGAME // Tobias DEBUG
 			AAS_ClearShownDebugLines();
-			AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
+			BotPrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
 			AAS_ShowReachability(&reach);
 #endif // Tobias END
 #ifndef BASEGAME // Tobias DEBUG
 			//botimport.Print(PRT_MESSAGE, "client %d: ", ms->client);
-			//AAS_PrintTravelType(reach.traveltype);
+			//BotPrintTravelType(reach.traveltype);
 			//botimport.Print(PRT_MESSAGE, "\n");
 #endif // Tobias END
 			switch (reach.traveltype & TRAVELTYPE_MASK) {
@@ -3348,12 +3410,10 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			Com_Memset(&reach, 0, sizeof(aas_reachability_t));
 		}
 #ifndef BASEGAME // Tobias DEBUG
-		if (botDeveloper) {
-			if (result->failure) {
-				botimport.Print(PRT_MESSAGE, "client %d: movement failure in ", ms->client);
-				AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
-				botimport.Print(PRT_MESSAGE, "\n");
-			}
+		if (result->failure) {
+			botimport.Print(PRT_MESSAGE, "client %d: movement failure in ", ms->client);
+			BotPrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
+			botimport.Print(PRT_MESSAGE, "\n");
 		}
 #endif // Tobias END
 	} else {
@@ -3398,20 +3458,19 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			}
 		}
 
-		if (botDeveloper) {
-			// if a jumppad is found with the trace but no reachability is found
-			if (foundjumppad && !ms->lastreachnum) {
-				botimport.Print(PRT_MESSAGE, "client %d didn't find jumppad reachability\n", ms->client);
-			}
+#ifndef BASEGAME // Tobias DEBUG
+		// if a jumppad is found with the trace but no reachability is found
+		if (foundjumppad && !ms->lastreachnum) {
+			botimport.Print(PRT_MESSAGE, "client %d didn't find jumppad reachability\n", ms->client);
 		}
-
+#endif // Tobias END
 		if (ms->lastreachnum) {
 			//botimport.Print(PRT_MESSAGE, "%s: NOT onground, swimming or against ladder\n", ClientName(ms->entitynum - 1));
 			AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
 			result->traveltype = reach.traveltype;
 #ifndef BASEGAME // Tobias DEBUG
 			//botimport.Print(PRT_MESSAGE, "client %d finish: ", ms->client);
-			//AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
+			//BotPrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
 			//botimport.Print(PRT_MESSAGE, "\n");
 #endif // Tobias END
 			switch (reach.traveltype & TRAVELTYPE_MASK) {
@@ -3464,12 +3523,10 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 
 			result->traveltype = reach.traveltype;
 #ifndef BASEGAME // Tobias DEBUG
-			if (botDeveloper) {
-				if (result->failure) {
-					botimport.Print(PRT_MESSAGE, "client %d: movement failure in finish ", ms->client);
-					AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
-					botimport.Print(PRT_MESSAGE, "\n");
-				}
+			if (result->failure) {
+				botimport.Print(PRT_MESSAGE, "client %d: movement failure in finish ", ms->client);
+				BotPrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
+				botimport.Print(PRT_MESSAGE, "\n");
 			}
 #endif // Tobias END
 		}

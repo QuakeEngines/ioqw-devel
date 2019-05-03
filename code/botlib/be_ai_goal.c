@@ -309,8 +309,9 @@ itemconfig_t *LoadItemConfig(char *filename) {
 	if (!ic->numiteminfo) {
 		botimport.Print(PRT_WARNING, "no item info loaded\n");
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
+#endif // Tobias END
 	return ic;
 }
 
@@ -507,10 +508,10 @@ void BotInitInfoEntities(void) {
 		}
 	}
 
-	if (botDeveloper) {
-		botimport.Print(PRT_MESSAGE, "%d map locations\n", numlocations);
-		botimport.Print(PRT_MESSAGE, "%d camp spots\n", numcampspots);
-	}
+#ifndef BASEGAME // Tobias DEBUG
+	botimport.Print(PRT_MESSAGE, "%d map locations\n", numlocations);
+	botimport.Print(PRT_MESSAGE, "%d camp spots\n", numcampspots);
+#endif // Tobias END
 }
 
 /*
@@ -662,8 +663,9 @@ void BotInitLevelItems(void) {
 
 		AddLevelItemToList(li);
 	}
-
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "found %d level items\n", numlevelitems);
+#endif // Tobias END
 }
 
 /*
@@ -1127,7 +1129,7 @@ void BotUpdateEntityItems(void) {
 						li->goalareanum = AAS_BestReachableArea(li->origin, ic->iteminfo[li->iteminfo].mins, ic->iteminfo[li->iteminfo].maxs, li->goalorigin);
 					}
 #ifndef BASEGAME // Tobias DEBUG
-					Log_Write("linked item %s to an entity", ic->iteminfo[li->iteminfo].classname);
+					botimport.Print(PRT_MESSAGE, "linked item %s to an entity\n", ic->iteminfo[li->iteminfo].classname);
 #endif // Tobias END
 					break;
 				}

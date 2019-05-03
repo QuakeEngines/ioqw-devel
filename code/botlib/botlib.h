@@ -51,11 +51,12 @@ struct weaponinfo_s;
 #define LINECOLOR_CYAN		6
 #define LINECOLOR_WHITE		7
 // Print types
-#define PRT_MESSAGE	1
-#define PRT_WARNING	2
-#define PRT_ERROR	3
-#define PRT_FATAL	4
-#define PRT_EXIT	5
+#define PRT_DEVELOPER	0
+#define PRT_MESSAGE		1
+#define PRT_WARNING		2
+#define PRT_ERROR		3
+#define PRT_FATAL		4
+#define PRT_EXIT		5
 // console message types
 #define CMS_NORMAL	0
 #define CMS_CHAT	1

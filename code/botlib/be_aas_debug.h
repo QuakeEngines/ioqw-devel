@@ -42,8 +42,12 @@ void AAS_ShowArea(int areanum, int groundfacesonly);
 void AAS_ShowAreaPolygons(int areanum, int color, int groundfacesonly);
 // draw a cros
 void AAS_DrawCross(vec3_t origin, float size, int color);
+// Tobias DEBUG
+/*
 // print the travel type
 void AAS_PrintTravelType(int traveltype);
+*/
+// Tobias END
 // draw an arrow
 void AAS_DrawArrow(vec3_t start, vec3_t end, int linecolor, int arrowcolor);
 // visualize the given reachability
