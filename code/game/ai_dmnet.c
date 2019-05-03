@@ -89,7 +89,7 @@ void BotRecordNodeSwitch(bot_state_t *bs, char *node, char *str, char *s) {
 
 	ClientName(bs->client, netname, sizeof(netname));
 	Com_sprintf(nodeswitch[numnodeswitches], 144, "%s at %2.1f entered %s: %s from %s\n", netname, FloatTime(), node, str, s);
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	if (0) {
 		BotAI_Print(PRT_MESSAGE, "%s", nodeswitch[numnodeswitches]);
 	}
@@ -151,7 +151,7 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 
 	// if the bot needs air
 	if (bs->lastair_time < FloatTime() - 6) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		//BotAI_Print(PRT_MESSAGE, "going for air\n");
 #endif // DEBUG
 		// if we can find an air goal
@@ -310,7 +310,7 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
 			*/
 			bs->ltg_time = FloatTime() + 20;
 		} else { // the bot gets sorta stuck with all the avoid timings, shouldn't happen though
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			char netname[128];
 
 			BotAI_Print(PRT_MESSAGE, "%s: no valid ltg (probably stuck)\n", ClientName(bs->client, netname, sizeof(netname)));
@@ -1613,7 +1613,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 		BotEntityInfo(goal->entitynum, &entinfo);
 		// if the entity the bot shoots at moved
 		if (!VectorCompare(bs->activatestack->origin, entinfo.origin)) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			BotAI_Print(PRT_MESSAGE, "hit shootable button or trigger\n");
 #endif // DEBUG
 			bs->activatestack->time = 0;
@@ -1640,7 +1640,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 		} else if (!bs->activatestack->shoot) {
 			// if the bot touches the current goal
 			if (trap_BotTouchingGoal(bs->origin, goal)) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 				BotAI_Print(PRT_MESSAGE, "touched button or trigger\n");
 #endif // DEBUG
 				bs->activatestack->time = 0;
@@ -2124,7 +2124,7 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	}
 	// if there is another better enemy
 	if (BotFindEnemy(bs, bs->enemy)) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		BotAI_Print(PRT_MESSAGE, "found new better enemy\n");
 #endif
 	}
@@ -2455,7 +2455,7 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
 	}
 	// if there is another better enemy
 	if (BotFindEnemy(bs, bs->enemy)) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		BotAI_Print(PRT_MESSAGE, "found new better enemy\n");
 #endif
 	}

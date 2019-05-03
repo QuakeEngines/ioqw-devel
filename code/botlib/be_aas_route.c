@@ -423,11 +423,11 @@ void AAS_CreateReversedReachability(void) {
 	aas_reachability_t *reach;
 	aas_areasettings_t *settings;
 	char *ptr;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime;
 
 	starttime = botimport.MilliSeconds();
-#endif
+#endif // Tobias END
 	// free reversed links that have already been created
 	if (aasworld.reversedreachability) {
 		FreeMemory(aasworld.reversedreachability);
@@ -458,9 +458,9 @@ void AAS_CreateReversedReachability(void) {
 			aasworld.reversedreachability[reach->areanum].numlinks++;
 		}
 	}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "reversed reachability %d msec\n", botimport.MilliSeconds() - starttime);
-#endif
+#endif // Tobias END
 }
 
 /*
@@ -509,11 +509,11 @@ void AAS_CalculateAreaTravelTimes(void) {
 	aas_reversedlink_t *revlink;
 	aas_reachability_t *reach;
 	aas_areasettings_t *settings;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime;
 
 	starttime = botimport.MilliSeconds();
-#endif
+#endif // Tobias END
 	// if there are still area travel times, free the memory
 	if (aasworld.areatraveltimes) {
 		FreeMemory(aasworld.areatraveltimes);
@@ -553,9 +553,9 @@ void AAS_CalculateAreaTravelTimes(void) {
 			}
 		}
 	}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "area travel times %d msec\n", botimport.MilliSeconds() - starttime);
-#endif
+#endif // Tobias END
 }
 
 /*
@@ -1702,9 +1702,9 @@ int AAS_AreaRouteToGoalArea(int areanum, vec3_t origin, int goalareanum, int tra
 	// NOTE: the number of routing updates is limited per frame
 	/*
 	if (aasworld.frameroutingupdates > MAX_FRAMEROUTINGUPDATES) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		//Log_Write("WARNING: AAS_AreaTravelTimeToGoalArea: frame routing updates overflowed");
-#endif
+#endif // Tobias END
 		return 0;
 	}
 	*/

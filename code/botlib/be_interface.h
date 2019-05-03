@@ -34,12 +34,12 @@ typedef struct botlib_globals_s {
 	int maxentities;	// maximum number of entities
 	int maxclients;		// maximum number of clients
 	float time;			// the global time
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	qboolean debug;		// true if debug is on
 	int goalareanum;
 	vec3_t goalorigin;
 	int runai;
-#endif
+#endif // Tobias END
 } botlib_globals_t;
 
 extern botlib_globals_t botlibglobals;

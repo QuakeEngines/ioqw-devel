@@ -338,11 +338,11 @@ weightconfig_t *ReadWeightConfig(char *filename) {
 	source_t *source;
 	fuzzyseperator_t *fs;
 	weightconfig_t *config = NULL;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime;
 
 	starttime = Sys_MilliSeconds();
-#endif // DEBUG
+#endif // Tobias END
 	if (!LibVarGetValue("bot_reloadcharacters")) {
 		avail = -1;
 
@@ -471,11 +471,11 @@ weightconfig_t *ReadWeightConfig(char *filename) {
 	FreeSource(source);
 	// if the file was located in a pak file
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	if (botDeveloper) {
 		botimport.Print(PRT_MESSAGE, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime);
 	}
-#endif // DEBUG
+#endif // Tobias END
 	if (!LibVarGetValue("bot_reloadcharacters")) {
 		weightFileList[avail] = config;
 	}

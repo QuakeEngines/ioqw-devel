@@ -522,7 +522,7 @@ AAS_PrintTravelType
 =======================================================================================================================================
 */
 void AAS_PrintTravelType(int traveltype) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	char *str;
 
 	switch (traveltype & TRAVELTYPE_MASK) {
@@ -577,7 +577,7 @@ void AAS_PrintTravelType(int traveltype) {
 	}
 
 	botimport.Print(PRT_MESSAGE, "%s", str);
-#endif
+#endif // Tobias END
 }
 
 /*

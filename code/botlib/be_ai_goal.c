@@ -1126,9 +1126,9 @@ void BotUpdateEntityItems(void) {
 						// also update the goal area number
 						li->goalareanum = AAS_BestReachableArea(li->origin, ic->iteminfo[li->iteminfo].mins, ic->iteminfo[li->iteminfo].maxs, li->goalorigin);
 					}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 					Log_Write("linked item %s to an entity", ic->iteminfo[li->iteminfo].classname);
-#endif // DEBUG
+#endif // Tobias END
 					break;
 				}
 			}
@@ -1446,9 +1446,9 @@ int BotChooseLTGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 				goal.iteminfo = 0;
 				// push the goal on the stack
 				BotPushGoal(goalstate, &goal);
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 				botimport.Print(PRT_MESSAGE, "chosen roam goal area %d\n", goal.areanum);
-#endif // DEBUG
+#endif // Tobias END
 				return qtrue;
 			}
 		}

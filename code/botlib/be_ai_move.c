@@ -446,9 +446,9 @@ int BotReachabilityArea(vec3_t origin, int testground) {
 			break;
 		}
 	}
-//#ifdef DEBUG
+//#ifndef BASEGAME // Tobias DEBUG
 	//botimport.Print(PRT_MESSAGE, "no reachability area\n");
-//#endif // DEBUG
+//#endif // Tobias END
 	return firstareanum;
 }
 */
@@ -830,11 +830,11 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum, int lastgoalareanum, in
 		}
 
 		if (i != MAX_AVOIDREACH && avoidreachtries[i] > AVOIDREACH_TRIES) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			if (botDeveloper) {
 				botimport.Print(PRT_MESSAGE, "avoiding reachability %d\n", avoidreach[i]);
 			}
-#endif // DEBUG
+#endif // Tobias END
 			continue;
 		}
 #endif // AVOIDREACH
@@ -1415,9 +1415,9 @@ void BotCheckBlocked(bot_movestate_t *ms, vec3_t dir, int checkbottom, bot_mover
 	if (!trace.startsolid && (trace.entityNum != ENTITYNUM_WORLD && trace.entityNum != ENTITYNUM_NONE)) {
 		result->blocked = qtrue;
 		result->blockentity = trace.entityNum;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		//botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
-#endif // DEBUG
+#endif // Tobias END
 	// if not in an area with reachability
 	} else if (checkbottom && !AAS_AreaReachability(ms->areanum)) {
 		// check if the bot is standing on something
@@ -1429,9 +1429,9 @@ void BotCheckBlocked(bot_movestate_t *ms, vec3_t dir, int checkbottom, bot_mover
 			result->blocked = qtrue;
 			result->blockentity = trace.entityNum;
 			result->flags |= MOVERESULT_ONTOPOF_OBSTACLE;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			//botimport.Print(PRT_MESSAGE, "%d: BotCheckBlocked: I'm blocked\n", ms->client);
-#endif // DEBUG
+#endif // Tobias END
 		}
 	}
 }
@@ -1509,9 +1509,9 @@ bot_moveresult_t BotFinishTravel_Walk(bot_movestate_t *ms, aas_reachability_t *r
 	ms->areanum = BotFuzzyPointReachabilityArea(ms->origin);
 
 	if (ms->areanum == reach->areanum) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "BotFinishTravel_Walk: already in reach area\n");
-#endif // DEBUG
+#endif // Tobias END
 		return result;
 	}
 	*/
@@ -2228,14 +2228,14 @@ bot_moveresult_t BotTravel_Elevator(bot_movestate_t *ms, aas_reachability_t *rea
 
 	// if standing on the plat
 	if (BotOnMover(ms->origin, ms->entitynum, reach)) {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "bot on elevator\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 		// if vertically not too far from the end point
 		if (fabsf(ms->origin[2] - reach->end[2]) < sv_maxbarrier->value) {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to end\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 			// move to the end point
 			VectorSubtract(reach->end, ms->origin, hordir);
 
@@ -2257,9 +2257,9 @@ bot_moveresult_t BotTravel_Elevator(bot_movestate_t *ms, aas_reachability_t *rea
 			dist = VectorNormalize(hordir);
 
 			if (dist > 10) {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 				botimport.Print(PRT_MESSAGE, "bot moving to center\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 				// move to the center of the plat
 				if (dist > 100) {
 					dist = 100;
@@ -2272,9 +2272,9 @@ bot_moveresult_t BotTravel_Elevator(bot_movestate_t *ms, aas_reachability_t *rea
 			}
 		}
 	} else {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "bot not on elevator\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 		// if very near the reachability end
 		VectorSubtract(reach->end, ms->origin, dir);
 
@@ -2312,9 +2312,9 @@ bot_moveresult_t BotTravel_Elevator(bot_movestate_t *ms, aas_reachability_t *rea
 		dist1 = VectorNormalize(dir1);
 		// if the elevator isn't down
 		if (!MoverDown(reach)) {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "elevator not down\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 			dist = dist1;
 
 			VectorCopy(dir1, dir);
@@ -2353,15 +2353,15 @@ bot_moveresult_t BotTravel_Elevator(bot_movestate_t *ms, aas_reachability_t *rea
 		dist2 = VectorNormalize(dir2);
 		// if very close to the reachability start or closer to the elevator center or between reachability start and elevator center
 		if (dist1 < 20 || dist2 < dist1 || DotProduct(dir1, dir2) < 0) {
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to center\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 			dist = dist2;
 			VectorCopy(dir2, dir);
 		} else { // closer to the reachability start
-#ifdef DEBUG_ELEVATOR
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to start\n");
-#endif // DEBUG_ELEVATOR
+#endif // Tobias END
 			dist = dist1;
 
 			VectorCopy(dir1, dir);
@@ -2488,16 +2488,16 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 	BotFuncBobStartEnd(reach, bob_start, bob_end, bob_origin);
 	// if standing ontop of the func_bobbing
 	if (BotOnMover(ms->origin, ms->entitynum, reach)) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "bot on func_bobbing\n");
-#endif
+#endif // Tobias END
 		// if near end point of reachability
 		VectorSubtract(bob_origin, bob_end, dir);
 
 		if (VectorLength(dir) < 24) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to reachability end\n");
-#endif
+#endif // Tobias END
 			// move to the end point
 			VectorSubtract(reach->end, ms->origin, hordir);
 
@@ -2519,9 +2519,9 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 			dist = VectorNormalize(hordir);
 
 			if (dist > 10) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 				botimport.Print(PRT_MESSAGE, "bot moving to func_bobbing center\n");
-#endif
+#endif // Tobias END
 				// move to the center of the func_bobbing
 				if (dist > 100) {
 					dist = 100;
@@ -2534,18 +2534,18 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 			}
 		}
 	} else {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "bot not ontop of func_bobbing\n");
-#endif
+#endif // Tobias END
 		// if very near the reachability end
 		VectorSubtract(reach->end, ms->origin, dir);
 
 		dist = VectorLength(dir);
 
 		if (dist < 64) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to end\n");
-#endif
+#endif // Tobias END
 			if (dist > 60) {
 				dist = 60;
 			}
@@ -2579,9 +2579,9 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 		VectorSubtract(bob_origin, bob_start, dir);
 
 		if (VectorLength(dir) > 16) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "func_bobbing not at start\n");
-#endif
+#endif // Tobias END
 			dist = dist1;
 
 			VectorCopy(dir1, dir);
@@ -2620,16 +2620,16 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 		dist2 = VectorNormalize(dir2);
 		// if very close to the reachability start or closer to the func_bobbing center or between reachability start and func_bobbing center
 		if (dist1 < 20 || dist2 < dist1 || DotProduct(dir1, dir2) < 0) {
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to func_bobbing center\n");
-#endif
+#endif // Tobias END
 			dist = dist2;
 
 			VectorCopy(dir2, dir);
 		} else { // closer to the reachability start
-#ifdef DEBUG_FUNCBOB
+#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "bot moving to reachability start\n");
-#endif
+#endif // Tobias END
 			dist = dist1;
 
 			VectorCopy(dir1, dir);
@@ -2989,11 +2989,11 @@ bot_moveresult_t BotMoveInGoalArea(bot_movestate_t *ms, bot_goal_t *goal) {
 	bot_moveresult_t_cleared(result);
 	vec3_t dir;
 	float dist, speed;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	//botimport.Print(PRT_MESSAGE, "%s: moving straight to goal\n", ClientName(ms->entitynum - 1));
 	//AAS_ClearShownDebugLines();
 	//AAS_DebugLine(ms->origin, goal->origin, LINECOLOR_RED);
-#endif // DEBUG
+#endif // Tobias END
 	// walk straight to the goal origin
 	dir[0] = goal->origin[0] - ms->origin[0];
 	dir[1] = goal->origin[1] - ms->origin[1];
@@ -3066,9 +3066,9 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 	}
 
 	if (!goal) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "client %d: movetogoal -> no goal\n", ms->client);
-#endif // DEBUG
+#endif // Tobias END
 		result->failure = qtrue;
 		return;
 	}
@@ -3205,7 +3205,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					reachnum = 0;
 				}
 			} else {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 				if (botDeveloper) {
 					if (ms->reachability_time < AAS_Time()) {
 						botimport.Print(PRT_MESSAGE, "client %d: reachability timeout in ", ms->client);
@@ -3218,7 +3218,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					}
 					*/
 				}
-#endif // DEBUG
+#endif // Tobias END
 				// if the goal area changed or the reachability timed out or the area changed
 				if (ms->lastgoalareanum != goal->areanum || ms->reachability_time < AAS_Time() || ms->lastareanum != ms->areanum) {
 					reachnum = 0;
@@ -3232,11 +3232,11 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 		if (!reachnum) {
 			// if the area has no reachability links
 			if (!AAS_AreaReachability(ms->areanum)) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 				if (botDeveloper) {
 					botimport.Print(PRT_MESSAGE, "area %d no reachability\n", ms->areanum);
 				}
-#endif // DEBUG
+#endif // Tobias END
 			}
 			// get a new reachability leading towards the goal
 			reachnum = BotGetReachabilityToGoal(ms->origin, ms->areanum, ms->lastgoalareanum, ms->lastareanum, ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries, goal, travelflags, ms->avoidspots, ms->numavoidspots, &resultflags);
@@ -3254,7 +3254,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				BotAddToAvoidReach(ms, reachnum, AVOIDREACH_TIME);
 #endif // AVOIDREACH
 			}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			else if (botDeveloper) {
 				botimport.Print(PRT_MESSAGE, "goal not reachable\n");
 				Com_Memset(&reach, 0, sizeof(aas_reachability_t)); // make compiler happy
@@ -3268,7 +3268,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					}
 				}
 			}
-#endif // DEBUG
+#endif // Tobias END
 		}
 
 		ms->lastreachnum = reachnum;
@@ -3279,16 +3279,16 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			// get the reachability from the number
 			AAS_ReachabilityFromNum(reachnum, &reach);
 			result->traveltype = reach.traveltype;
-#ifdef DEBUG_AI_MOVE
+#ifndef BASEGAME // Tobias DEBUG
 			AAS_ClearShownDebugLines();
 			AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
 			AAS_ShowReachability(&reach);
-#endif // DEBUG_AI_MOVE
-#ifdef DEBUG
+#endif // Tobias END
+#ifndef BASEGAME // Tobias DEBUG
 			//botimport.Print(PRT_MESSAGE, "client %d: ", ms->client);
 			//AAS_PrintTravelType(reach.traveltype);
 			//botimport.Print(PRT_MESSAGE, "\n");
-#endif // DEBUG
+#endif // Tobias END
 			switch (reach.traveltype & TRAVELTYPE_MASK) {
 				case TRAVEL_WALK:
 					*result = BotTravel_Walk(ms, &reach);
@@ -3347,7 +3347,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 
 			Com_Memset(&reach, 0, sizeof(aas_reachability_t));
 		}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		if (botDeveloper) {
 			if (result->failure) {
 				botimport.Print(PRT_MESSAGE, "client %d: movement failure in ", ms->client);
@@ -3355,7 +3355,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				botimport.Print(PRT_MESSAGE, "\n");
 			}
 		}
-#endif // DEBUG
+#endif // Tobias END
 	} else {
 		int i, numareas, areas[16];
 		vec3_t end;
@@ -3409,11 +3409,11 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			//botimport.Print(PRT_MESSAGE, "%s: NOT onground, swimming or against ladder\n", ClientName(ms->entitynum - 1));
 			AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
 			result->traveltype = reach.traveltype;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			//botimport.Print(PRT_MESSAGE, "client %d finish: ", ms->client);
 			//AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
 			//botimport.Print(PRT_MESSAGE, "\n");
-#endif // DEBUG
+#endif // Tobias END
 			switch (reach.traveltype & TRAVELTYPE_MASK) {
 				case TRAVEL_WALK:
 					*result = BotTravel_Walk(ms, &reach);
@@ -3463,7 +3463,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			}
 
 			result->traveltype = reach.traveltype;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 			if (botDeveloper) {
 				if (result->failure) {
 					botimport.Print(PRT_MESSAGE, "client %d: movement failure in finish ", ms->client);
@@ -3471,7 +3471,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					botimport.Print(PRT_MESSAGE, "\n");
 				}
 			}
-#endif // DEBUG
+#endif // Tobias END
 		}
 	}
 	// FIXME: is it right to do this here?

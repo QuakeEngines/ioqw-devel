@@ -150,7 +150,7 @@ bot_weaponstate_t *BotWeaponStateFromHandle(int handle) {
 
 	return botweaponstates[handle];
 }
-#ifdef DEBUG_AI_WEAP
+#ifndef BASEGAME // Tobias DEBUG
 /*
 =======================================================================================================================================
 DumpWeaponConfig
@@ -176,7 +176,7 @@ void DumpWeaponConfig(weaponconfig_t *wc) {
 		Log_Flush();
 	}
 }
-#endif // DEBUG_AI_WEAP
+#endif // Tobias END
 /*
 =======================================================================================================================================
 LoadWeaponConfig
@@ -521,9 +521,9 @@ int BotSetupWeaponAI(void) {
 		botimport.Print(PRT_FATAL, "couldn't load the weapon config\n");
 		return BLERR_CANNOTLOADWEAPONCONFIG;
 	}
-#ifdef DEBUG_AI_WEAP
+#ifndef BASEGAME // Tobias DEBUG
 	DumpWeaponConfig(weaponconfig);
-#endif // DEBUG_AI_WEAP
+#endif // Tobias END
 	return BLERR_NOERROR;
 }
 

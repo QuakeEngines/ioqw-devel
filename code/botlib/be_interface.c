@@ -202,9 +202,9 @@ int Export_BotLibShutdown(void) {
 	PC_RemoveAllGlobalDefines();
 	// dump all allocated memory
 	//DumpMemory();
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	PrintMemoryLabels();
-#endif
+#endif // Tobias END
 	// shut down library log file
 	Log_Shutdown();
 
@@ -262,9 +262,9 @@ Export_BotLibLoadMap
 =======================================================================================================================================
 */
 int Export_BotLibLoadMap(const char *mapname) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime = botimport.MilliSeconds();
-#endif
+#endif // Tobias END
 	int errnum;
 
 	if (!BotLibSetup("BotLoadMap")) {
@@ -283,9 +283,9 @@ int Export_BotLibLoadMap(const char *mapname) {
 	BotSetBrushModelTypes();	// be_ai_move.h
 
 	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", botimport.MilliSeconds() - starttime);
-#endif
+#endif // Tobias END
 	return BLERR_NOERROR;
 }
 
@@ -324,7 +324,7 @@ BotExportTest
 */
 int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 	//return AAS_PointLight(parm2, NULL, NULL, NULL);
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	static int area = -1;
 	static int line[2];
 	int newarea, i, highlightarea, flood;
@@ -652,7 +652,7 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 		}
 	}
 #endif
-#endif
+#endif // Tobias END
 	return 0;
 }
 

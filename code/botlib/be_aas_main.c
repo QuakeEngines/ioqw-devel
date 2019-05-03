@@ -88,11 +88,11 @@ void AAS_SetInitialized(void) {
 
 	aasworld.initialized = qtrue;
 	botimport.Print(PRT_MESSAGE, "AAS initialized.\n");
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	// create all the routing cache
 	//AAS_CreateAllRoutingCache();
 	//AAS_RoutingInfo();
-#endif
+#endif // Tobias END
 }
 
 /*

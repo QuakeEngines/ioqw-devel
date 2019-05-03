@@ -1021,9 +1021,9 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename) {
 	token_t token;
 	bot_randomlist_t *randomlist, *lastrandom, *random;
 	bot_randomstring_t *randomstring;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime = Sys_MilliSeconds();
-#endif // DEBUG
+#endif // Tobias END
 	size = 0;
 	randomlist = NULL;
 	random = NULL;
@@ -1110,10 +1110,10 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename) {
 	}
 
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "random strings %d msec\n", Sys_MilliSeconds() - starttime);
 	//BotDumpRandomStringList(randomlist);
-#endif // DEBUG
+#endif // Tobias END
 	return randomlist;
 }
 
@@ -2137,11 +2137,11 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname) {
 	bot_chat_t *chat = NULL;
 	bot_chattype_t *chattype = NULL;
 	bot_chatmessage_t *chatmessage = NULL;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime;
 
 	starttime = Sys_MilliSeconds();
-#endif // DEBUG
+#endif // Tobias END
 	size = 0;
 	foundchat = qfalse;
 	// a bot chat is parsed in two phases
@@ -2286,9 +2286,9 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname) {
 	if (botDeveloper) {
 		BotCheckInitialChatIntegrety(chat);
 	}
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "initial chats loaded in %d msec\n", Sys_MilliSeconds() - starttime);
-#endif // DEBUG
+#endif // Tobias END
 	// character was read successfully
 	return chat;
 }
@@ -2646,9 +2646,9 @@ void BotInitialChat(int chatstate, char *type, int mcontext, char *var0, char *v
 	message = BotChooseInitialChatMessage(cs, type);
 	// if there's no message of the given type
 	if (!message) {
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "no chat messages of type %s\n", type);
-#endif // DEBUG
+#endif // Tobias END
 		return;
 	}
 
@@ -3144,9 +3144,9 @@ BotSetupChatAI
 */
 int BotSetupChatAI(void) {
 	char *file;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	int starttime = Sys_MilliSeconds();
-#endif // DEBUG
+#endif // Tobias END
 	file = LibVarString("synfile", "syn.c");
 	synonyms = BotLoadSynonyms(file);
 	file = LibVarString("rndfile", "rnd.c");
@@ -3160,9 +3160,9 @@ int BotSetupChatAI(void) {
 	}
 
 	InitConsoleMessageHeap();
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	botimport.Print(PRT_MESSAGE, "setup chat AI %d msec\n", Sys_MilliSeconds() - starttime);
-#endif // DEBUG
+#endif // Tobias END
 	return BLERR_NOERROR;
 }
 

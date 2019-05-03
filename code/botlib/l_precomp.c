@@ -756,7 +756,7 @@ int PC_ExpandDefine(source_t *source, token_t *deftoken, define_t *define, token
 		if (!PC_ReadDefineParms(source, define, parms, MAX_DEFINEPARMS)) {
 			return qfalse;
 		}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 		for (i = 0; i < define->numparms; i++) {
 			Log_Write("define parms %d:", i);
 
@@ -764,7 +764,7 @@ int PC_ExpandDefine(source_t *source, token_t *deftoken, define_t *define, token
 				Log_Write("%s", pt->string);
 			}
 		}
-#endif // DEBUG_EVAL
+#endif // Tobias END
 	}
 	// empty list at first
 	first = NULL;
@@ -2000,7 +2000,7 @@ int PC_EvaluateTokens(source_t *source, token_t *tokens, signed long int *intval
 
 		v1 = v;
 		v2 = v->next;
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 		if (integer) {
 			Log_Write("operator %s, value1 = %d", PunctuationFromNum(source->scriptstack, o->operator), v1->intvalue);
 
@@ -2014,7 +2014,7 @@ int PC_EvaluateTokens(source_t *source, token_t *tokens, signed long int *intval
 				Log_Write("value2 = %f", v2->floatvalue);
 			}
 		}
-#endif // DEBUG_EVAL
+#endif // Tobias END
 		switch (o->operator) {
 			case P_LOGIC_NOT:
 				v1->intvalue = !v1->intvalue;
@@ -2137,13 +2137,13 @@ int PC_EvaluateTokens(source_t *source, token_t *tokens, signed long int *intval
 				break;
 			}
 		}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 		if (integer) {
 			Log_Write("result value = %d", v1->intvalue);
 		} else {
 			Log_Write("result value = %f", v1->floatvalue);
 		}
-#endif // DEBUG_EVAL
+#endif // Tobias END
 		if (error) {
 			break;
 		}
@@ -2314,23 +2314,23 @@ int PC_Evaluate(source_t *source, signed long int *intvalue, float *floatvalue, 
 	if (!PC_EvaluateTokens(source, firsttoken, intvalue, floatvalue, integer)) {
 		return qfalse;
 	}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 	Log_Write("eval:");
-#endif // DEBUG_EVAL
+#endif // Tobias END
 	for (t = firsttoken; t; t = nexttoken) {
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 		Log_Write(" %s", t->string);
-#endif // DEBUG_EVAL
+#endif // Tobias END
 		nexttoken = t->next;
 		PC_FreeToken(t);
 	}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 	if (integer) {
 		Log_Write("eval result: %d", *intvalue);
 	} else {
 		Log_Write("eval result: %f", *floatvalue);
 	}
-#endif // DEBUG_EVAL
+#endif // Tobias END
 	return qtrue;
 }
 
@@ -2441,23 +2441,23 @@ int PC_DollarEvaluate(source_t *source, signed long int *intvalue, float *floatv
 	if (!PC_EvaluateTokens(source, firsttoken, intvalue, floatvalue, integer)) {
 		return qfalse;
 	}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 	Log_Write("$eval:");
-#endif // DEBUG_EVAL
+#endif // Tobias END
 	for (t = firsttoken; t; t = nexttoken) {
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 		Log_Write(" %s", t->string);
-#endif // DEBUG_EVAL
+#endif // Tobias END
 		nexttoken = t->next;
 		PC_FreeToken(t);
 	}
-#ifdef DEBUG_EVAL
+#ifndef BASEGAME // Tobias DEBUG
 	if (integer) {
 		Log_Write("$eval result: %d", *intvalue);
 	} else {
 		Log_Write("$eval result: %f", *floatvalue);
 	}
-#endif // DEBUG_EVAL
+#endif // Tobias END
 	return qtrue;
 }
 

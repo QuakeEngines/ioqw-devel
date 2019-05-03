@@ -4655,7 +4655,7 @@ int AAS_ContinueInitReachability(float time) {
 		AAS_Reachability_Elevator();
 		// create func_bobbing reachabilities
 		AAS_Reachability_FuncBobbing();
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "%6d reach swim\n", reach_swim);
 		botimport.Print(PRT_MESSAGE, "%6d reach equal floor\n", reach_equalfloor);
 		botimport.Print(PRT_MESSAGE, "%6d reach step\n", reach_step);
@@ -4670,7 +4670,7 @@ int AAS_ContinueInitReachability(float time) {
 		botimport.Print(PRT_MESSAGE, "%6d reach elevator\n", reach_elevator);
 		botimport.Print(PRT_MESSAGE, "%6d reach rocketjump\n", reach_rocketjump);
 		botimport.Print(PRT_MESSAGE, "%6d reach jumppad\n", reach_jumppad);
-#endif
+#endif // Tobias END
 		// store all the reachabilities
 		AAS_StoreReachability();
 		// free the reachability link heap

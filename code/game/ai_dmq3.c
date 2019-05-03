@@ -403,9 +403,9 @@ BotSetTeamStatus
 void BotSetTeamStatus(bot_state_t *bs) {
 	int teamtask;
 	aas_entityinfo_t entinfo;
-
-	teamtask = TEAMTASK_NONE; // Tobias DEBUG
-
+#ifndef BASEGAME // Tobias DEBUG
+	teamtask = TEAMTASK_NONE;
+#endif // Tobias END
 	switch (bs->ltgtype) {
 		case LTG_GETFLAG:
 			teamtask = TEAMTASK_OFFENSE;
@@ -442,7 +442,7 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		case LTG_CAMPORDER:
 			teamtask = TEAMTASK_CAMP;
 			break;
-// Tobias DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 		case LTG_PATROL:
 		case LTG_GETITEM:
 		case LTG_KILL:
@@ -451,7 +451,7 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		default:
 			teamtask = TEAMTASK_NONE; // roaming
 			break;
-// Tobias END
+#endif // Tobias END
 	}
 
 	BotSetUserInfo(bs, "teamtask", va("%d", teamtask));
@@ -813,7 +813,7 @@ void BotCTFSeekGoals(bot_state_t *bs) {
 	}
 
 	bs->owndecision_time = FloatTime() + 5;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1063,7 +1063,7 @@ void Bot1FCTFSeekGoals(bot_state_t *bs) {
 	}
 
 	bs->owndecision_time = FloatTime() + 5;
-#ifdef DEBUG
+#ifndef BASEGAME // Tobias DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
