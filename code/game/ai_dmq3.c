@@ -67,6 +67,7 @@ vmCvar_t bot_challenge;
 vmCvar_t bot_predictobstacles;
 // Tobias HACK: new bot test cvars for debugging
 // DEBUG
+vmCvar_t bot_noshoot;
 vmCvar_t bot_equalize;
 vmCvar_t bot_equalizer_aim;
 vmCvar_t bot_equalizer_react;
@@ -4069,6 +4070,11 @@ void BotCheckAttack(bot_state_t *bs) {
 			// FIXME: check if a teammate gets radial damage
 		}
 	}
+// Tobias DEBUG
+	if (bot_noshoot.integer) {
+		return;
+	}
+// DEBUG
 	// if fire has to be release to activate weapon
 	if (wi.flags & WFL_FIRERELEASED) {
 		if (bs->flags & BFL_ATTACKED) {
@@ -5932,6 +5938,7 @@ void BotSetupDeathmatchAI(void) {
 	trap_Cvar_Register(&bot_predictobstacles, "bot_predictobstacles", "1", 0);
 // Tobias HACK
 // DEBUG
+	trap_Cvar_Register(&bot_noshoot, "bot_noshoot", "0", 0);
 	trap_Cvar_Register(&bot_equalize, "bot_equalize", "1", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_aim, "bot_equalizer_aim", "0.8", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_react, "bot_equalizer_react", "0.5", CVAR_USERINFO|CVAR_ARCHIVE);

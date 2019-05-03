@@ -1654,6 +1654,7 @@ int BotAIStartFrame(int time) {
 	trap_Cvar_Update(&bot_saveroutingcache);
 	trap_Cvar_Update(&bot_pause);
 	trap_Cvar_Update(&bot_report);
+	trap_Cvar_Update(&bot_noshoot); // Tobias DEBUG
 	trap_Cvar_Update(&bot_shownodechanges); // Tobias DEBUG
 
 	if (bot_report.integer) {
@@ -1885,6 +1886,12 @@ int BotInitLibrary(void) {
 	trap_BotLibVarSet("log", buf);
 	// no chatting
 	trap_Cvar_VariableStringBuffer("bot_nochat", buf, sizeof(buf));
+
+	if (strlen(buf)) {
+		trap_BotLibVarSet("nochat", buf);
+	}
+	// no shooting
+	trap_Cvar_VariableStringBuffer("bot_noshoot", buf, sizeof(buf));
 
 	if (strlen(buf)) {
 		trap_BotLibVarSet("nochat", buf);
