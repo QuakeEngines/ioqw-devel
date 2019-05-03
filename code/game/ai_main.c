@@ -69,6 +69,7 @@ vmCvar_t bot_interbreedchar;
 vmCvar_t bot_interbreedbots;
 vmCvar_t bot_interbreedcycle;
 vmCvar_t bot_interbreedwrite;
+vmCvar_t bot_shownodechanges; // Tobias DEBUG
 
 void ExitLevel(void);
 
@@ -431,6 +432,95 @@ void BotTeamplayReport(void) {
 		}
 	}
 }
+// Tobias DEBUG
+/*
+=======================================================================================================================================
+BotReportStatus2
+=======================================================================================================================================
+*/
+void BotReportStatus2(bot_state_t *bs) {
+	char buf[MAX_INFO_STRING];
+	char netname[MAX_MESSAGE_SIZE];
+	char leader[MAX_MESSAGE_SIZE];
+	char carrying[MAX_MESSAGE_SIZE];
+	char action[MAX_MESSAGE_SIZE];
+	char node[MAX_MESSAGE_SIZE];
+
+	trap_GetConfigstring(CS_BOTINFO+bs->client, buf, sizeof(buf));
+
+	if (!*buf) {
+		return;
+	}
+
+	ClientName(bs->client, netname, sizeof(netname));
+
+	Q_strncpyz(leader, Info_ValueForKey(buf, "l"), sizeof(leader));
+	Q_strncpyz(carrying, Info_ValueForKey(buf, "c"), sizeof(carrying));
+	Q_strncpyz(action, Info_ValueForKey(buf, "a"), sizeof(action));
+	Q_strncpyz(node, Info_ValueForKey(buf, "n"), sizeof(node));
+
+	BotAI_Print(PRT_MESSAGE, "%-20s%-1s%-2s: %s(%s)\n", netname, leader, carrying, action, node);
+}
+
+/*
+=======================================================================================================================================
+Svcmd_BotTeamplayReport_f
+=======================================================================================================================================
+*/
+void Svcmd_BotTeamplayReport_f(void) {
+	int i;
+
+	if (!bot_report.integer) {
+		BotAI_Print(PRT_MESSAGE, "Must set bot_report 1 before using botreport command.\n");
+		return;
+	}
+
+	if (gametype > GT_TOURNAMENT) {
+		BotAI_Print(PRT_MESSAGE, S_COLOR_RED"RED\n");
+
+		for (i = 0; i < level.maxclients; i++) {
+			if (!botstates[i] || !botstates[i]->inuse) {
+				continue;
+			}
+
+			if (BotTeam(botstates[i]) == TEAM_RED) {
+				if (bot_report.integer == 1) {
+					BotReportStatus(botstates[i]);
+				} else {
+					BotReportStatus2(botstates[i]);
+				}
+			}
+		}
+
+		BotAI_Print(PRT_MESSAGE, S_COLOR_BLUE"BLUE\n");
+
+		for (i = 0; i < level.maxclients; i++) {
+			if (!botstates[i] || !botstates[i]->inuse) {
+				continue;
+			}
+
+			if (BotTeam(botstates[i]) == TEAM_BLUE) {
+				if (bot_report.integer == 1) {
+					BotReportStatus(botstates[i]);
+				} else {
+					BotReportStatus2(botstates[i]);
+				}
+			}
+		}
+	} else {
+		for (i = 0; i < level.maxclients; i++) {
+			if (!botstates[i] || !botstates[i]->inuse) {
+				continue;
+			}
+
+			if (bot_report.integer == 1) {
+				BotReportStatus(botstates[i]);
+			} else {
+				BotReportStatus2(botstates[i]);
+			}
+		}
+	}
+}
 
 /*
 =======================================================================================================================================
@@ -547,8 +637,12 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 			break;
 		}
 	}
-
-	cs = va("l\\%s\\c\\%s\\a\\%s", leader, carrying, action);
+	
+	if (bot_report.integer == 1) {
+		cs = va("l\\%s\\c\\%s\\a\\%s", leader, carrying, action);
+	} else {
+		cs = va("l\\%s\\c\\%s\\a\\%s\\n\\%s", leader, carrying, action, bs->ainodename);
+	}
 
 	trap_SetConfigstring(CS_BOTINFO + bs->client, cs);
 }
@@ -562,6 +656,13 @@ void BotUpdateInfoConfigStrings(void) {
 	int i;
 	char buf[MAX_INFO_STRING];
 
+	// let bot_report 0 run once to clear strings
+	if (bot_report.modificationCount != level.botReportModificationCount) {
+		level.botReportModificationCount = bot_report.modificationCount;
+	} else if (!bot_report.integer) {
+		return;
+	}
+
 	for (i = 0; i < level.maxclients; i++) {
 		if (!botstates[i] || !botstates[i]->inuse) {
 			continue;
@@ -573,10 +674,14 @@ void BotUpdateInfoConfigStrings(void) {
 			continue;
 		}
 
-		BotSetInfoConfigString(botstates[i]);
+		if (!bot_report.integer) {
+			trap_SetConfigstring(CS_BOTINFO + i, "");
+		} else {
+			BotSetInfoConfigString(botstates[i]);
+		}
 	}
 }
-
+// Tobias END?
 /*
 =======================================================================================================================================
 BotInterbreedBots
@@ -1402,6 +1507,8 @@ int BotAIShutdownClient(int client, qboolean restart) {
 	if (BotChat_ExitGame(bs)) {
 		trap_BotEnterChat(bs->cs, bs->client, CHAT_ALL);
 	}
+
+	trap_SetConfigstring(CS_BOTINFO + bs->client, ""); // Tobias DEBUG
 	// free the move state
 	trap_BotFreeMoveState(bs->ms);
 	// free the goal state
@@ -1547,10 +1654,14 @@ int BotAIStartFrame(int time) {
 	trap_Cvar_Update(&bot_saveroutingcache);
 	trap_Cvar_Update(&bot_pause);
 	trap_Cvar_Update(&bot_report);
+	trap_Cvar_Update(&bot_shownodechanges); // Tobias DEBUG
 
 	if (bot_report.integer) {
-		BotTeamplayReport();
-		trap_Cvar_SetValue("bot_report", 0);
+		if (bot_report.integer == 1) {
+			BotTeamplayReport();
+			trap_Cvar_SetValue("bot_report", 0);
+		}
+
 		BotUpdateInfoConfigStrings();
 	}
 
@@ -1838,14 +1949,17 @@ int BotAISetup(int restart) {
 	trap_Cvar_Register(&bot_memorydump, "bot_memorydump", "0", 0);
 	trap_Cvar_Register(&bot_saveroutingcache, "bot_saveroutingcache", "0", 0);
 	trap_Cvar_Register(&bot_pause, "bot_pause", "0", 0);
-	trap_Cvar_Register(&bot_report, "bot_report", "0", 0);
+	trap_Cvar_Register(&bot_report, "bot_report", "2", 0);
 	trap_Cvar_Register(&bot_testsolid, "bot_testsolid", "0", 0);
 	trap_Cvar_Register(&bot_testclusters, "bot_testclusters", "0", 0);
 	trap_Cvar_Register(&bot_developer, "bot_developer", "0", 0);
+	trap_Cvar_Register(&bot_shownodechanges, "bot_shownodechanges", "0", 0); // Tobias DEBUG
 	trap_Cvar_Register(&bot_interbreedchar, "bot_interbreedchar", "", 0);
 	trap_Cvar_Register(&bot_interbreedbots, "bot_interbreedbots", "10", 0);
 	trap_Cvar_Register(&bot_interbreedcycle, "bot_interbreedcycle", "20", 0);
 	trap_Cvar_Register(&bot_interbreedwrite, "bot_interbreedwrite", "", 0);
+
+	level.botReportModificationCount = bot_report.modificationCount; // Tobias DEBUG
 	// if the game is restarted for a tournament
 	if (restart) {
 		return qtrue;

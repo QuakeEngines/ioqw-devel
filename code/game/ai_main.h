@@ -115,6 +115,7 @@ typedef struct bot_state_s {
 	int entityeventTime[MAX_GENTITIES];		// last entity event time
 	bot_settings_t settings;				// several bot settings
 	int (*ainode)(struct bot_state_s *bs);	// current AI node
+	char ainodename[32];					// current AI node name // Tobias DEBUG
 	float thinktime;						// time the bot thinks this frame
 	vec3_t origin;							// origin of the bot
 	vec3_t velocity;						// velocity of the bot
@@ -265,3 +266,7 @@ int BotAI_GetClientState(int clientNum, playerState_t *state);
 int BotAI_GetEntityState(int entityNum, entityState_t *state);
 int BotAI_GetSnapshotEntity(int clientNum, int sequence, entityState_t *state);
 int BotTeamLeader(bot_state_t *bs);
+ // Tobias DEBUG
+extern vmCvar_t bot_developer;
+extern vmCvar_t bot_shownodechanges;
+ // Tobias END

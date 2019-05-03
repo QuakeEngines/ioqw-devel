@@ -542,6 +542,7 @@ svcmds[] = {
 	{"removeip", qfalse, Svcmd_RemoveIP_f},
 #ifndef BASEGAME // Tobias DEBUG
 	{"teleport", qfalse, Svcmd_Teleport_f},
+	{"botreport", qfalse, Svcmd_BotTeamplayReport_f},
 #endif // Tobias END
 };
 

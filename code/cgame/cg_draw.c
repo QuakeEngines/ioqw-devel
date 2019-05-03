@@ -2279,7 +2279,63 @@ static void CG_DrawIntermission(void) {
 	cg.scoreFadeTime = cg.time;
 	cg.scoreBoardShowing = CG_DrawScoreboard();
 }
+// Tobias DEBUG
+/*
+=======================================================================================================================================
+CG_DrawBotInfo
 
+Draw info for bot that player is following.
+=======================================================================================================================================
+*/
+static qboolean CG_DrawBotInfo(void) {
+	const char *info, *str, *leader, *carrying, *action, *node;
+	int w;
+
+	if (!(cg.snap->ps.pm_flags & PMF_FOLLOW)) {
+		return qfalse;
+	}
+
+	info = CG_ConfigString(CS_BOTINFO + cg.snap->ps.clientNum);
+
+	if (!*info) {
+		return qfalse;
+	}
+
+	node = Info_ValueForKey(info, "n");
+
+	if (*node) {
+		str = va("AI Node: %s", node);
+		w = CG_DrawStrlen(str) * BIGCHAR_WIDTH;
+		CG_DrawBigString(320 - w / 2, 164, str, 1.0f);
+	}
+
+	action = Info_ValueForKey(info, "a");
+
+	if (*action) {
+		str = va("LTG: %s", action);
+		w = CG_DrawStrlen(action) * BIGCHAR_WIDTH;
+		CG_DrawBigString(320 - w / 2, 182, str, 1.0f);
+	}
+
+	leader = Info_ValueForKey(info, "l");
+
+	if (*leader) {
+		str = "Bot is leader";
+		w = CG_DrawStrlen(str) * BIGCHAR_WIDTH;
+		CG_DrawBigString(320 - w / 2, 200, str, 1.0f);
+	}
+
+	carrying = Info_ValueForKey(info, "c");
+
+	if (*carrying) {
+		str = va("Bot carrying: %s", carrying);
+		w = CG_DrawStrlen(str) * BIGCHAR_WIDTH;
+		CG_DrawBigString(320 - w / 2, 218, str, 1.0f);
+	}
+
+	return qtrue;
+}
+// Tobias END
 /*
 =======================================================================================================================================
 CG_DrawFollow
@@ -2307,6 +2363,7 @@ static qboolean CG_DrawFollow(void) {
 	x = 0.5 * (640 - GIANT_WIDTH * CG_DrawStrlen(name));
 
 	CG_DrawStringExt(x, 40, name, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0);
+	CG_DrawBotInfo(); // Tobias DEBUG
 	return qtrue;
 }
 
