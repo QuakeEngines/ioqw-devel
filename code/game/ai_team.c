@@ -1521,7 +1521,7 @@ void BotCTFOrders_BothFlagsNotAtBase(bot_state_t *bs) {
 		// passive strategy
 		{
 			// different orders based on the number of team mates
-			switch (bs->numteammates) {
+			switch (numteammates) {
 				case 1:
 					break;
 				case 2:
@@ -1668,7 +1668,7 @@ void BotCTFOrders_TeamFlagNotAtBase(bot_state_t *bs) {
 		// passive strategy
 		{
 			// different orders based on the number of team mates
-			switch (bs->numteammates) {
+			switch (numteammates) {
 				case 1:
 					break;
 				case 2:
@@ -1743,7 +1743,7 @@ void BotCTFOrders_TeamFlagNotAtBase(bot_state_t *bs) {
 		case CTFS_AGGRESSIVE:
 		{
 			// different orders based on the number of team mates
-			switch (bs->numteammates) {
+			switch (numteammates) {
 				case 1:
 					break;
 				case 2:
