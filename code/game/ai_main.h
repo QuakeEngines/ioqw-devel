@@ -269,4 +269,6 @@ int BotTeamLeader(bot_state_t *bs);
  // Tobias DEBUG
 extern vmCvar_t bot_developer;
 extern vmCvar_t bot_shownodechanges;
+extern vmCvar_t bot_teambluestrategy;
+extern vmCvar_t bot_teamredstrategy;
  // Tobias END

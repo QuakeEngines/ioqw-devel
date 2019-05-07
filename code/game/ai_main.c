@@ -69,7 +69,11 @@ vmCvar_t bot_interbreedchar;
 vmCvar_t bot_interbreedbots;
 vmCvar_t bot_interbreedcycle;
 vmCvar_t bot_interbreedwrite;
-vmCvar_t bot_shownodechanges; // Tobias DEBUG
+// Tobias DEBUG
+vmCvar_t bot_shownodechanges;
+vmCvar_t bot_teambluestrategy;
+vmCvar_t bot_teamredstrategy;
+// Tobias END
 
 void ExitLevel(void);
 
@@ -1654,9 +1658,12 @@ int BotAIStartFrame(int time) {
 	trap_Cvar_Update(&bot_saveroutingcache);
 	trap_Cvar_Update(&bot_pause);
 	trap_Cvar_Update(&bot_report);
-	trap_Cvar_Update(&bot_noshoot); // Tobias DEBUG
-	trap_Cvar_Update(&bot_shownodechanges); // Tobias DEBUG
-
+// Tobias DEBUG
+	trap_Cvar_Update(&bot_noshoot);
+	trap_Cvar_Update(&bot_shownodechanges);
+	trap_Cvar_Update(&bot_teambluestrategy);
+	trap_Cvar_Update(&bot_teamredstrategy);
+// Tobias END
 	if (bot_report.integer) {
 		if (bot_report.integer == 1) {
 			BotTeamplayReport();
@@ -1894,7 +1901,7 @@ int BotInitLibrary(void) {
 	trap_Cvar_VariableStringBuffer("bot_noshoot", buf, sizeof(buf));
 
 	if (strlen(buf)) {
-		trap_BotLibVarSet("nochat", buf);
+		trap_BotLibVarSet("bot_noshoot", buf);
 	}
 	// visualize jump pads
 	trap_Cvar_VariableStringBuffer("bot_visualizejumppads", buf, sizeof(buf));
@@ -1960,7 +1967,11 @@ int BotAISetup(int restart) {
 	trap_Cvar_Register(&bot_testsolid, "bot_testsolid", "0", 0);
 	trap_Cvar_Register(&bot_testclusters, "bot_testclusters", "0", 0);
 	trap_Cvar_Register(&bot_developer, "bot_developer", "0", 0);
-	trap_Cvar_Register(&bot_shownodechanges, "bot_shownodechanges", "0", 0); // Tobias DEBUG
+// Tobias DEBUG
+	trap_Cvar_Register(&bot_shownodechanges, "bot_shownodechanges", "0", 0);
+	trap_Cvar_Register(&bot_teambluestrategy, "bot_teambluestrategy", "0", 0);
+	trap_Cvar_Register(&bot_teamredstrategy, "bot_teamredstrategy", "0", 0);
+// Tobias END
 	trap_Cvar_Register(&bot_interbreedchar, "bot_interbreedchar", "", 0);
 	trap_Cvar_Register(&bot_interbreedbots, "bot_interbreedbots", "10", 0);
 	trap_Cvar_Register(&bot_interbreedcycle, "bot_interbreedcycle", "20", 0);
