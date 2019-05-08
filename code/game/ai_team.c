@@ -899,7 +899,7 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					break;
 				case 2:
 				{
-					// tell the one not carrying the flag to attack the enemy base
+					// tell the one not carrying the flag to defend the base
 					if (teammates[0] != bs->flagcarrier) {
 						other = teammates[0];
 					} else {
@@ -907,9 +907,9 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					}
 
 					ClientName(other, name, sizeof(name));
-					BotAI_BotInitialChat(bs, "cmd_attackenemybase", name, NULL);
+					BotAI_BotInitialChat(bs, "cmd_defendbase", name, NULL);
 					BotSayTeamOrder(bs, other);
-					BotSayVoiceTeamOrder(bs, other, VOICECHAT_OFFENSE);
+					BotSayVoiceTeamOrder(bs, other, VOICECHAT_DEFEND);
 					break;
 				}
 				case 3:
@@ -945,8 +945,8 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 							BotSayVoiceTeamOrder(bs, other, VOICECHAT_FOLLOWFLAGCARRIER);
 						}
 					} else {
-						BotAI_BotInitialChat(bs, "cmd_getflag", name, NULL);
-						BotSayVoiceTeamOrder(bs, other, VOICECHAT_GETFLAG);
+						BotAI_BotInitialChat(bs, "cmd_accompany", name, carriername, NULL);
+						BotSayVoiceTeamOrder(bs, other, VOICECHAT_FOLLOWFLAGCARRIER);
 					}
 
 					BotSayTeamOrder(bs, other);
@@ -1026,7 +1026,7 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					break;
 				case 2:
 				{
-					// tell the one not carrying the flag to defend the base
+					// tell the one not carrying the flag to attack the enemy base
 					if (teammates[0] != bs->flagcarrier) {
 						other = teammates[0];
 					} else {
@@ -1034,9 +1034,9 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					}
 
 					ClientName(other, name, sizeof(name));
-					BotAI_BotInitialChat(bs, "cmd_defendbase", name, NULL);
+					BotAI_BotInitialChat(bs, "cmd_attackenemybase", name, NULL);
 					BotSayTeamOrder(bs, other);
-					BotSayVoiceTeamOrder(bs, other, VOICECHAT_DEFEND);
+					BotSayVoiceTeamOrder(bs, other, VOICECHAT_OFFENSE);
 					break;
 				}
 				case 3:
@@ -1066,8 +1066,8 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 						BotAI_BotInitialChat(bs, "cmd_accompanyme", name, NULL);
 						BotSayVoiceTeamOrder(bs, other, VOICECHAT_FOLLOWME);
 					} else {
-						BotAI_BotInitialChat(bs, "cmd_accompany", name, carriername, NULL);
-						BotSayVoiceTeamOrder(bs, other, VOICECHAT_FOLLOWFLAGCARRIER);
+						BotAI_BotInitialChat(bs, "cmd_getflag", name, NULL);
+						BotSayVoiceTeamOrder(bs, other, VOICECHAT_GETFLAG);
 					}
 
 					BotSayTeamOrder(bs, other);
