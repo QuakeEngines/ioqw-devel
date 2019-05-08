@@ -484,11 +484,11 @@ void BotHarvesterOrders(bot_state_t *bs) {
 					if (defenders > 3) {
 						defenders = 3;
 					}
-					// 70% go harvesting
-					attackers = (int)(float)numteammates * 0.7 + 0.5;
+					// 60% go harvesting
+					attackers = (int)(float)numteammates * 0.6 + 0.5;
 
-					if (attackers > 7) {
-						attackers = 7;
+					if (attackers > 6) {
+						attackers = 6;
 					}
 
 					for (i = 0; i < defenders; i++) {
@@ -663,11 +663,11 @@ void BotObeliskOrders(bot_state_t *bs) {
 					if (defenders > 3) {
 						defenders = 3;
 					}
-					// 70% attack the enemy base
-					attackers = (int)(float)numteammates * 0.7 + 0.5;
+					// 60% attack the enemy base
+					attackers = (int)(float)numteammates * 0.6 + 0.5;
 
-					if (attackers > 7) {
-						attackers = 7;
+					if (attackers > 6) {
+						attackers = 6;
 					}
 
 					for (i = 0; i < defenders; i++) {
@@ -960,11 +960,11 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					if (defenders > 3) {
 						defenders = 3;
 					}
-					// 70% accompanies the flag carrier
-					attackers = (int)(float)numteammates * 0.7 + 0.5;
+					// 60% accompanies the flag carrier
+					attackers = (int)(float)numteammates * 0.6 + 0.5;
 
-					if (attackers > 7) {
-						attackers = 7;
+					if (attackers > 6) {
+						attackers = 6;
 					}
 
 					for (i = 0; i < defenders; i++) {
@@ -1081,11 +1081,11 @@ void Bot1FCTFOrders_TeamHasFlag(bot_state_t *bs) {
 					if (defenders > 2) {
 						defenders = 2;
 					}
-					// 80% accompanies the flag carrier
-					attackers = (int)(float)numteammates * 0.8 + 0.5;
+					// 70% accompanies the flag carrier
+					attackers = (int)(float)numteammates * 0.7 + 0.5;
 
-					if (attackers > 8) {
-						attackers = 8;
+					if (attackers > 7) {
+						attackers = 7;
 					}
 
 					for (i = 0; i < defenders; i++) {
