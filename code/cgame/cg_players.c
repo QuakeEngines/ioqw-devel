@@ -2192,7 +2192,7 @@ static void CG_PlayerSprites(centity_t *cent, const refEntity_t *parent) {
 		friendFlags = thirdPersonFlags = 0;
 	}
 // Tobias DEBUG
-	if (cg_drawDebug.integer) {
+	if (cg_drawDebug.integer && cgs.gametype > GT_TOURNAMENT) {
 		if (ci) {
 			qhandle_t h;
 
