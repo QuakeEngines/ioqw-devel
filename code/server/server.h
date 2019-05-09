@@ -276,7 +276,7 @@ void SV_UpdateConfigstrings(client_t *client);
 void SV_SetUserinfo(int index, const char *val);
 void SV_GetUserinfo(int index, char *buffer, int bufferSize);
 void SV_ChangeMaxClients(void);
-void SV_SpawnServer(char *server, qboolean killBots);
+void SV_SpawnServer(char *server);
 // sv_client.c
 void SV_GetChallenge(netadr_t from);
 void SV_DirectConnect(netadr_t from);

@@ -155,7 +155,6 @@ Restart the server on a different map.
 static void SV_Map_f(void) {
 	char *cmd;
 	char *map;
-	qboolean killBots, cheat;
 	char expanded[MAX_QPATH];
 	char mapname[MAX_QPATH];
 
@@ -184,23 +183,7 @@ static void SV_Map_f(void) {
 		Cvar_SetLatched("sv_maxclients", "8");
 
 		cmd += 2;
-
-		if (!Q_stricmp(cmd, "devmap")) {
-			cheat = qtrue;
-		} else {
-			cheat = qfalse;
-		}
-
-		killBots = qtrue;
 	} else {
-		if (!Q_stricmp(cmd, "devmap")) {
-			cheat = qtrue;
-			killBots = qtrue;
-		} else {
-			cheat = qfalse;
-			killBots = qfalse;
-		}
-
 		if (sv_gametype->integer == GT_SINGLE_PLAYER) {
 			Cvar_SetValue("g_gametype", GT_FFA);
 		}
@@ -208,10 +191,10 @@ static void SV_Map_f(void) {
 	// save the map name here cause on a map restart we reload the config.cfg and thus nuke the arguments of the map command
 	Q_strncpyz(mapname, map, sizeof(mapname));
 	// start up the map
-	SV_SpawnServer(mapname, killBots);
+	SV_SpawnServer(mapname);
 	// set the cheat value
 	// if the level was started with "map <levelname>", then cheats will not be allowed. If started with "devmap <levelname>" then cheats will be allowed
-	if (cheat) {
+	if (!Q_stricmp(cmd, "devmap")) {
 		Cvar_SetValue("sv_cheats", 1);
 	} else {
 		Cvar_SetValue("sv_cheats", 0);
@@ -265,7 +248,7 @@ static void SV_MapRestart_f(void) {
 		Com_Printf("variable change -- restarting.\n");
 		// restart the map the slow way
 		Q_strncpyz(mapname, Cvar_VariableString("mapname"), sizeof(mapname));
-		SV_SpawnServer(mapname, qfalse);
+		SV_SpawnServer(mapname);
 		return;
 	}
 	// toggle the server bit so clients can detect that a map_restart has happened

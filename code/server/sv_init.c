@@ -379,7 +379,7 @@ SV_SpawnServer
 Change the server to a new map, taking all connected clients along with it. This is NOT called for map_restart.
 =======================================================================================================================================
 */
-void SV_SpawnServer(char *server, qboolean killBots) {
+void SV_SpawnServer(char *server) {
 	int i;
 	int checksum;
 	qboolean isBot;
@@ -473,11 +473,6 @@ void SV_SpawnServer(char *server, qboolean killBots) {
 			char *denied;
 
 			if (svs.clients[i].netchan.remoteAddress.type == NA_BOT) {
-				if (killBots) {
-					SV_DropClient(&svs.clients[i], "");
-					continue;
-				}
-
 				isBot = qtrue;
 			} else {
 				isBot = qfalse;
