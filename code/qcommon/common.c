@@ -2609,7 +2609,7 @@ void Com_Init(char *commandLine) {
 	com_singlePlayerActive = Cvar_Get("ui_singlePlayerActive", "0", CVAR_SYSTEMINFO|CVAR_ROM);
 	com_blood = Cvar_Get("com_blood", "1", CVAR_ARCHIVE);
 	com_logfile = Cvar_Get("logfile", "0", CVAR_TEMP);
-	com_timescale = Cvar_Get("timescale", "1", CVAR_CHEAT|CVAR_SYSTEMINFO);
+	com_timescale = Cvar_Get("timescale", "1", CVAR_SYSTEMINFO); // Tobias DEBUG
 	com_fixedtime = Cvar_Get("fixedtime", "0", CVAR_CHEAT);
 	com_showtrace = Cvar_Get("com_showtrace", "0", CVAR_CHEAT);
 	com_speeds = Cvar_Get("com_speeds", "0", 0);

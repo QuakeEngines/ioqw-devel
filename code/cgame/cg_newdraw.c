@@ -456,7 +456,7 @@ qhandle_t CG_StatusHandle(int task) {
 		case TEAMTASK_CAMP:
 			h = cgs.media.campShader;
 			break;
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 		case TEAMTASK_PATROL:
 			h = cgs.media.patrolShader;
 			break;
@@ -468,11 +468,7 @@ qhandle_t CG_StatusHandle(int task) {
 			}
 
 			break;
-#else
-		default:
-			h = cgs.media.patrolShader;
-			break;
-#endif // Tobias END
+// Tobias END
 	}
 
 	return h;

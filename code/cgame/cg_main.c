@@ -123,9 +123,7 @@ vmCvar_t cg_crosshairHealth;
 vmCvar_t cg_draw2D;
 vmCvar_t cg_drawStatus;
 vmCvar_t cg_animSpeed;
-#ifndef BASEGAME // Tobias DEBUG
-vmCvar_t cg_drawDebug;
-#endif // Tobias END
+vmCvar_t cg_drawDebug; // Tobias DEBUG
 vmCvar_t cg_debugAnim;
 vmCvar_t cg_debugPosition;
 vmCvar_t cg_debugEvents;
@@ -267,9 +265,7 @@ static cvarTable_t cvarTable[] = {
 	{&cg_bobyaw, "cg_bobyaw", "0.0015", CVAR_ARCHIVE},
 	{&cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT},
 	{&cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT},
-#ifndef BASEGAME // Tobias DEBUG
-	{&cg_drawDebug, "cg_drawDebug", "1", CVAR_ARCHIVE},
-#endif // Tobias END
+	{&cg_drawDebug, "cg_drawDebug", "1", CVAR_ARCHIVE}, // Tobias DEBUG
 	{&cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT},
 	{&cg_debugPosition, "cg_debugposition", "0", CVAR_CHEAT},
 	{&cg_debugEvents, "cg_debugevents", "0", CVAR_CHEAT},
@@ -1207,9 +1203,9 @@ static void CG_RegisterGraphics(void) {
 	cgs.media.flagShaders[1] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_capture.tga");
 	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
 	// task shaders
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 	cgs.media.roamShader = trap_R_RegisterShaderNoMip("gfx/2d/defer.tga");
-#endif // Tobias END
+// Tobias END
 	cgs.media.patrolShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/patrol.tga");
 	cgs.media.assaultShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/assault.tga");
 	cgs.media.campShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/camp.tga");

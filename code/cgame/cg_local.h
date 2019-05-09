@@ -759,9 +759,7 @@ typedef struct {
 	// flag shaders
 	qhandle_t flagShaders[3];
 	// task shaders
-#ifndef BASEGAME // Tobias DEBUG
-	qhandle_t roamShader;
-#endif // Tobias END
+	qhandle_t roamShader; // Tobias DEBUG
 	qhandle_t patrolShader;
 	qhandle_t assaultShader;
 	qhandle_t campShader;
@@ -1018,9 +1016,7 @@ extern vmCvar_t cg_crosshairHealth;
 extern vmCvar_t cg_drawStatus;
 extern vmCvar_t cg_draw2D;
 extern vmCvar_t cg_animSpeed;
-#ifndef BASEGAME // Tobias DEBUG
-extern vmCvar_t cg_drawDebug;
-#endif // Tobias END
+extern vmCvar_t cg_drawDebug; // Tobias DEBUG
 extern vmCvar_t cg_debugAnim;
 extern vmCvar_t cg_debugPosition;
 extern vmCvar_t cg_debugEvents;
