@@ -701,7 +701,7 @@ gentity_t *fire_bfg(gentity_t *self, vec3_t start, vec3_t dir) {
 	// count is used to check if the missile left the player bbox, if count == 1 then the missile left the player bbox and can attack to it
 	bolt->count = 0;
 	bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trTime = level.time;
+	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME; // move a bit on the very first frame
 
 	VectorCopy(start, bolt->s.pos.trBase);
 	VectorScale(dir, 2000, bolt->s.pos.trDelta);
