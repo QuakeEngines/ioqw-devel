@@ -3980,6 +3980,120 @@ static void UI_RunMenuScript(char **args) {
 					}
 				}
 			}
+		} else if (Q_stricmp(name, "StartServerIngame") == 0) {
+// Tobias FIXME: 1: Changing the gametype from a team game to ffa and than back to a team game will switch teams for some connected players, and also displays the wrong HUD (Free for all HUD in team gametypes and vice versa, etc.)!
+//				 2: Waiting for too long before starting a new server will CRASH! Is this still the case?
+			int i, delay, clients, oldclients;
+			float skill;
+
+			trap_Cvar_SetValue("cg_thirdPerson", 0);
+			trap_Cvar_SetValue("cg_cameraOrbit", 0);
+			trap_Cvar_SetValue("ui_singlePlayerActive", 0);
+			trap_Cvar_SetValue("dedicated", Com_Clamp(0, 2, ui_dedicated.integer));
+			trap_Cvar_SetValue("g_gametype", Com_Clamp(0, GT_MAX_GAME_TYPE - 1, uiInfo.gameTypes[ui_netGameType.integer].gtEnum));
+			trap_Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_opponentName"));
+			trap_Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_teamName"));
+			trap_Cmd_ExecuteText(EXEC_APPEND, va("map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName));
+			// Tobias FIXME: this script will add bots and doesn't check if there are already enough bots, so we must kick already connected bots, otherwise bots are added to the existing ones continuously with each new map (FIXME?).
+			// Tobias NOTE: we must kick bots before executing the map command otherwise bots become 'invisible' (FIXME?).
+			// Tobias FIXME: unfortunately kicking bots AFTER map loading spawns some extra skulls again, https://github.com/ioquake/ioq3/commit/f7c3276fe803388bd613ab6bf6ad8e0a6647b740#diff-08c7587b3da3e294c50c64c1024339d7
+			trap_Cmd_ExecuteText(EXEC_APPEND, "kickbots\n");
+			// set max clients based on spots
+			oldclients = trap_Cvar_VariableValue("sv_maxClients");
+			clients = 0;
+
+			if (ui_actualNetGameType.integer > GT_TOURNAMENT) {
+				for (i = 0; i < PLAYERS_PER_TEAM; i++) {
+					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+
+					if (bot >= 0) {
+						clients++;
+					}
+
+					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+
+					if (bot >= 0) {
+						clients++;
+					}
+				}
+			} else {
+				for (i = 0; i < PLAYERS_NOT_TEAM; i++) {
+					int bot = trap_Cvar_VariableValue(va("ui_notteam%i", i + 1));
+
+					if (bot >= 0) {
+						clients++;
+					}
+				}
+			}
+
+			if (clients == 0) {
+				clients = 8;
+			}
+
+			if (oldclients > clients) {
+				clients = oldclients;
+			}
+
+			trap_Cvar_SetValue("sv_maxClients", clients);
+
+			skill = trap_Cvar_VariableValue("g_spSkill");
+			delay = 500;
+
+			if (ui_actualNetGameType.integer > GT_TOURNAMENT) {
+				// 0 - None
+				// 1 - Human
+				// 2 - Random Bot
+				// 3.. NumCharacters - Bot
+				for (i = 0; i < PLAYERS_PER_TEAM; i++) {
+					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+
+					if (bot > 1) {
+						if (bot == 2) {
+							name = "random";
+						} else {
+							name = uiInfo.characterList[bot - 3].name;
+						}
+
+						Com_sprintf(buff, sizeof(buff), "addbot %s %f %s %i\n", name, skill, "Red", delay);
+						trap_Cmd_ExecuteText(EXEC_APPEND, buff);
+
+						delay += 500;
+					}
+
+					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+
+					if (bot > 1) {
+						if (bot == 2) {
+							name = "random";
+						} else {
+							name = uiInfo.characterList[bot - 3].name;
+						}
+
+						Com_sprintf(buff, sizeof(buff), "addbot %s %f %s %i\n", name, skill, "Blue", delay);
+						trap_Cmd_ExecuteText(EXEC_APPEND, buff);
+
+						delay += 500;
+					}
+				}
+			} else {
+				for (i = 0; i < PLAYERS_NOT_TEAM; i++) {
+					int bot = trap_Cvar_VariableValue(va("ui_notteam%i", i + 1));
+
+					if (bot > 1) {
+						if (bot == 2) {
+							name = "random";
+						} else {
+							name = UI_GetBotNameByNumber(bot - 3);
+						}
+
+						Com_sprintf(buff, sizeof(buff), "addbot %s %f %i\n", name, skill, delay);
+						trap_Cmd_ExecuteText(EXEC_APPEND, buff);
+
+						delay += 500;
+					}
+				}
+			}
+// Tobias END
 		} else if (Q_stricmp(name, "updateSPMenu") == 0) {
 			UI_SetCapFragLimits(qtrue);
 			UI_MapCountByGameType(qtrue);
