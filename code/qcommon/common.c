@@ -2605,7 +2605,7 @@ void Com_Init(char *commandLine) {
 #if idppc_altivec
 	com_altivec = Cvar_Get("com_altivec", "1", CVAR_ARCHIVE);
 #endif
-	com_maxfps = Cvar_Get("com_maxfps", "500", CVAR_ARCHIVE);
+	com_maxfps = Cvar_Get("com_maxfps", "500", CVAR_ARCHIVE); // Tobias DEBUG
 	com_singlePlayerActive = Cvar_Get("ui_singlePlayerActive", "0", CVAR_SYSTEMINFO|CVAR_ROM);
 	com_blood = Cvar_Get("com_blood", "1", CVAR_ARCHIVE);
 	com_logfile = Cvar_Get("logfile", "0", CVAR_TEMP);
