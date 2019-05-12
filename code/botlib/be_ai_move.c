@@ -73,7 +73,6 @@ typedef struct bot_movestate_s {
 	int numavoidspots;
 } bot_movestate_t;
 // used to avoid reachability links for some time after being used
-#define AVOIDREACH
 #define AVOIDREACH_TIME 6 // avoid links for 6 seconds after use
 #define AVOIDREACH_TRIES 4
 // prediction times
@@ -892,7 +891,6 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum, int lastgoalareanum, in
 	bestreachnum = 0;
 
 	for (reachnum = AAS_NextAreaReachability(areanum, 0); reachnum; reachnum = AAS_NextAreaReachability(areanum, reachnum)) {
-#ifdef AVOIDREACH
 		// check if it isn't a reachability to avoid
 		for (i = 0; i < MAX_AVOIDREACH; i++) {
 			if (avoidreach[i] == reachnum && avoidreachtimes[i] >= AAS_Time()) {
@@ -906,7 +904,6 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum, int lastgoalareanum, in
 #endif // Tobias END
 			continue;
 		}
-#endif // AVOIDREACH
 		// get the reachability from the number
 		AAS_ReachabilityFromNum(reachnum, &reach);
 		// NOTE: do not go back to the previous area if the goal didn't change
@@ -1153,7 +1150,7 @@ BotGapDistance
 =======================================================================================================================================
 */
 float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
-	int dist;
+	int gapdist;
 	float startz;
 	vec3_t start, end;
 	aas_trace_t trace;
@@ -1174,8 +1171,8 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 		startz = trace.endpos[2] + 1;
 	}
 
-	for (dist = 8; dist <= 100; dist += 8) {
-		VectorMA(origin, dist, hordir, start);
+	for (gapdist = 8; gapdist <= 100; gapdist += 8) {
+		VectorMA(origin, gapdist, hordir, start);
 
 		start[2] = startz + 24;
 
@@ -1196,8 +1193,8 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 					break;
 				}
 				// if a gap is found slow down
-				//botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "BotGapDistance: found a gap at %i.\n", dist);
-				return dist;
+				//botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "BotGapDistance: found a gap at %i.\n", gapdist);
+				return gapdist;
 			}
 
 			startz = trace.endpos[2];
@@ -1512,6 +1509,7 @@ BotTravel_Walk
 */
 bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) {
 	float dist, speed;
+	float gapdist;
 	vec3_t hordir;
 	bot_moveresult_t_cleared(result);
 
@@ -1538,19 +1536,19 @@ bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) 
 		}
 	}
 
-	dist = BotGapDistance(ms->origin, hordir, ms->entitynum); // Tobias NOTE: in a perfect world we would not need this! Try to get rid of gap checking here(it works fine, but it looks ugly)
+	gapdist = BotGapDistance(ms->origin, hordir, ms->entitynum); // Tobias NOTE: in a perfect world we would not need this! Try to get rid of gap checking here(it works fine, but it looks ugly)
 
 	if (ms->moveflags & MFL_WALK) {
-		if (dist > 0) {
-			speed = 200 - (180 - dist);
+		if (gapdist > 0) {
+			speed = 200 - (180 - gapdist);
 		} else {
 			speed = 200;
 		}
 
 		EA_Walk(ms->client);
 	} else {
-		if (dist > 0) {
-			speed = 400 - (360 - 2 * dist);
+		if (gapdist > 0) {
+			speed = 400 - (360 - 2 * gapdist);
 		} else {
 			speed = 400;
 		}
@@ -3314,10 +3312,8 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				AAS_ReachabilityFromNum(reachnum, &reach);
 				// set a timeout for this reachability
 				ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
-#ifdef AVOIDREACH
 				// add the reachability to the reachabilities to avoid for a while
 				BotAddToAvoidReach(ms, reachnum, AVOIDREACH_TIME);
-#endif // AVOIDREACH
 			}
 #ifndef BASEGAME // Tobias DEBUG
 			else {

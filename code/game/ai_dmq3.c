@@ -2785,16 +2785,16 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 	// walk, crouch or jump
 	movetype = MOVE_WALK;
 
-	if (bs->attackcrouch_time < FloatTime() - 1) {
+	if (bs->crouch_time < FloatTime() - 1) {
 		if (random() < jumper) {
 			movetype = MOVE_JUMP;
 		// wait at least one second before crouching again
-		} else if (bs->attackcrouch_time < FloatTime() - 1 && random() < croucher) {
-			bs->attackcrouch_time = FloatTime() + croucher * 5;
+		} else if (bs->crouch_time < FloatTime() - 1 && random() < croucher) {
+			bs->crouch_time = FloatTime() + croucher * 5;
 		}
 	}
 
-	if (bs->attackcrouch_time > FloatTime()) {
+	if (bs->crouch_time > FloatTime()) {
 		movetype = MOVE_CROUCH;
 	}
 	// if the bot should jump
