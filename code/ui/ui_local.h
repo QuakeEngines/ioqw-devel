@@ -200,7 +200,8 @@ qboolean UI_RegisterClientModelname(playerInfo_t *pi, const char *modelSkinName,
 #define MAX_GAMETYPES 16
 #define MAX_MAPS 128
 #define MAX_SPMAPS 16
-#define PLAYERS_PER_TEAM 5
+#define PLAYERS_PER_TEAM 7
+#define PLAYERS_NOT_TEAM 14
 #define MAX_PINGREQUESTS 32
 #define MAX_ADDRESSLENGTH 64
 #define MAX_HOSTNAMELENGTH 22
