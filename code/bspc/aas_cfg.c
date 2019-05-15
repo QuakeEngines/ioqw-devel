@@ -186,7 +186,7 @@ int LoadCfgFile(char *filename)
 	token_t token;
 	int settingsdefined;
 
-	source = LoadSourceFile(filename, NULL);
+	source = LoadSourceFile(filename);
 	if (!source)
 	{
 		Log_Print("couldn't open cfg file %s\n", filename);

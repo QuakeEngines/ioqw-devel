@@ -49,7 +49,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include "be_aas_bspc.h"
 
 extern	int use_nodequeue;		//brushbsp.c
-extern	int calcgrapplereach;	//be_aas_reach.c
 
 float			subdivide_size = 240;
 char			source[1024];
@@ -289,7 +288,6 @@ int main (int argc, char **argv)
 	Log_Print(BSPC_NAME" version "BSPC_VERSION", %s %s\n", __DATE__, __TIME__);
 
 #ifdef ZTMAUTOARGS
-	calcgrapplereach = true;
 	forcesidesvisible = true; // Currently always required or BSPC fails?
 #endif
 	DefaultCfg();
@@ -400,18 +398,6 @@ int main (int argc, char **argv)
 			freetree = true;
 			Log_Print("freetree = true\n");
 		} //end else if
-		else if (!stricmp(argv[i], "-grapplereach"))
-		{
-			calcgrapplereach = true;
-			Log_Print("grapplereach = true\n");
-		} //end else if
-#ifdef ZTMAUTOARGS
-		else if (!stricmp(argv[i], "-nograpplereach"))
-		{
-			calcgrapplereach = false;
-			Log_Print("grapplereach = false\n");
-		} //end else if
-#endif
 		else if (!stricmp(argv[i], "-nobrushmerge"))
 		{
 			nobrushmerge = true;

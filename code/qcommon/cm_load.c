@@ -603,10 +603,10 @@ void CM_LoadMap(const char *name, qboolean clientload, int *checksum) {
 		return;
 	}
 	// load the file
-#ifndef BSPC
+#ifndef BSPC // Tobias FIXME
 	length = FS_ReadFile(name, &buf.v);
-#else
-	length = LoadQuakeFile((quakefile_t *)name, &buf.v);
+//#else
+//	length = LoadQuakeFile((quakefile_t *)name, &buf.v);
 #endif
 	if (!buf.i) {
 		Com_Error(ERR_DROP, "Couldn't load %s", name);
