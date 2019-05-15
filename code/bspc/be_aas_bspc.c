@@ -208,14 +208,29 @@ void Com_DPrintf(const char *fmt, ...)
 //===========================================================================
 void AAS_InitBotImport(void)
 {
+	botimport.MilliSeconds = Sys_MilliSeconds;
+	botimport.Print = BotImport_Print;
+	botimport.Trace = BotImport_Trace;
+	botimport.EntityTrace = NULL;
+	botimport.PointContents = BotImport_PointContents;
+	botimport.inPVS = NULL;
 	botimport.BSPEntityData = BotImport_BSPEntityData;
+	botimport.BSPModelMinsMaxsOrigin = BotImport_BSPModelMinsMaxsOrigin;
+	botimport.BotClientCommand = NULL;
 	botimport.GetMemory = BotImport_GetMemory;
 	botimport.FreeMemory = FreeMemory;
-	botimport.Trace = BotImport_Trace;
-	botimport.PointContents = BotImport_PointContents;
-	botimport.Print = BotImport_Print;
-	botimport.MilliSeconds = Sys_MilliSeconds;
-	botimport.BSPModelMinsMaxsOrigin = BotImport_BSPModelMinsMaxsOrigin;
+	botimport.AvailableMemory = NULL;
+	botimport.HunkAlloc = NULL;
+	botimport.FS_FOpenFile = NULL;
+	botimport.FS_Read = NULL;
+	botimport.FS_Write = NULL;
+	botimport.FS_FCloseFile = NULL;
+	botimport.FS_Seek = NULL;
+	botimport.DebugLineCreate = NULL;
+	botimport.DebugLineDelete = NULL;
+	botimport.DebugLineShow = NULL;
+	botimport.DebugPolygonCreate = NULL;
+	botimport.DebugPolygonDelete = NULL;
 } //end of the function AAS_InitBotImport
 //===========================================================================
 //

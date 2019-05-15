@@ -1020,6 +1020,7 @@ int LoadMapFromBSP(struct quakefile_s *qf)
 
 	idheader.ident = LittleLong(idheader.ident);
 	idheader.version = LittleLong(idheader.version);
+
 	//Quake3 BSP file
 	if (idheader.ident == Q3_BSP_IDENT && idheader.version == Q3_BSP_VERSION)
 	{
