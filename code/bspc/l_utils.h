@@ -48,7 +48,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #endif
 
 //random in the range [0, 1]
-#define random()			((rand () & 0x7fff) / ((float)0x7fff))
+//#define random()			((rand () & 0x7fff) / ((float)0x7fff))
 //random in the range [-1, 1]
 #define crandom()			(2.0 * (random() - 0.5))
 //min and max
