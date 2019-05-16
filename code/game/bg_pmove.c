@@ -1449,7 +1449,7 @@ static void PM_CheckDuck(void) {
 	} else { // stand up if possible
 		if (pm->ps->pm_flags & PMF_DUCKED) {
 			// try to stand up
-			pm->maxs[2] = 32;
+			pm->maxs[2] = 56; // 56 + 24 = 80 (80 * 2.5 = 200)
 			pm->trace(&trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask);
 
 			if (!trace.allsolid) {
@@ -1462,7 +1462,7 @@ static void PM_CheckDuck(void) {
 		pm->maxs[2] = 16;
 		pm->ps->viewheight = CROUCH_VIEWHEIGHT;
 	} else {
-		pm->maxs[2] = 32;
+		pm->maxs[2] = 56; // 56 + 24 = 80 (80 * 2.5 = 200)
 		pm->ps->viewheight = DEFAULT_VIEWHEIGHT;
 	}
 }

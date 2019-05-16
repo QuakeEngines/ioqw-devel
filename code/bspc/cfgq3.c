@@ -36,12 +36,12 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define PRESENCE_NORMAL				2
 #define PRESENCE_CROUCH				4
 
-bbox	//30x30x56
+bbox	//30x30x80
 {
 	presencetype	PRESENCE_NORMAL
 	flags			0x0000
 	mins			{-15, -15, -24}
-	maxs			{15, 15, 32}
+	maxs			{15, 15, 56}
 } //end bbox
 
 bbox	//30x30x40
