@@ -64,7 +64,7 @@ void AAS_PresenceTypeBoundingBox(int presencetype, vec3_t mins, vec3_t maxs) {
 	int index;
 	// bounding box size for each presence type
 	vec3_t boxmins[3] = {{0, 0, 0}, {-15, -15, -24}, {-15, -15, -24}};
-	vec3_t boxmaxs[3] = {{0, 0, 0}, {15, 15, 56}, {15, 15, 8}};
+	vec3_t boxmaxs[3] = {{0, 0, 0}, {15, 15, 56}, {15, 15, 42}}; // Tobias CHECK: why was this 8 and not 16 (see 'PM_CheckDuck' etc.)?
 
 	if (presencetype == PRESENCE_NORMAL) {
 		index = 1;

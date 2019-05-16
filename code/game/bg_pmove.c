@@ -1459,7 +1459,7 @@ static void PM_CheckDuck(void) {
 	}
 
 	if (pm->ps->pm_flags & PMF_DUCKED) {
-		pm->maxs[2] = 16;
+		pm->maxs[2] = 42;
 		pm->ps->viewheight = CROUCH_VIEWHEIGHT;
 	} else {
 		pm->maxs[2] = 56; // 56 + 24 = 80 (80 * 2.5 = 200)

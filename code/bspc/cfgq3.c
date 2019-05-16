@@ -44,12 +44,12 @@ bbox	//30x30x80
 	maxs			{15, 15, 56}
 } //end bbox
 
-bbox	//30x30x40
+bbox	//30x30x66
 {
 	presencetype	PRESENCE_CROUCH
 	flags			0x0001
 	mins			{-15, -15, -24}
-	maxs			{15, 15, 16}
+	maxs			{15, 15, 42}
 } //end bbox
 
 settings
