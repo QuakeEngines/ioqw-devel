@@ -27,7 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 **************************************************************************************************************************************/
 
 #include "cm_local.h"
-
+#include "../bspc/l_qfiles.h"
 // to allow boxes to be treated as brush models, we allocate some extra indexes along with those needed by the map
 #define BOX_BRUSHES 1
 #define BOX_SIDES 6
@@ -603,10 +603,10 @@ void CM_LoadMap(const char *name, qboolean clientload, int *checksum) {
 		return;
 	}
 	// load the file
-#ifndef BSPC // Tobias FIXME
+#ifndef BSPC
 	length = FS_ReadFile(name, &buf.v);
-//#else
-//	length = LoadQuakeFile((quakefile_t *)name, &buf.v);
+#else
+	length = LoadQuakeFile((quakefile_t *)name, &buf.v);
 #endif
 	if (!buf.i) {
 		Com_Error(ERR_DROP, "Couldn't load %s", name);
