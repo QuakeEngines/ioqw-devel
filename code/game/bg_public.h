@@ -41,8 +41,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define SCORE_NOT_PRESENT -9999	// for the CS_SCORES[12] when only one player is present
 #define VOTE_TIME 30000 // 30 seconds before vote times out
 #define MINS_Z -24
-#define DEFAULT_VIEWHEIGHT 26
-#define CROUCH_VIEWHEIGHT 12
+#define DEFAULT_VIEWHEIGHT 40 // 38?
+#define CROUCH_VIEWHEIGHT 20
 #define DEAD_VIEWHEIGHT -16
 #define OBELISK_TARGET_HEIGHT 56
 #define MAX_DLIGHT_CONFIGSTRINGS 128

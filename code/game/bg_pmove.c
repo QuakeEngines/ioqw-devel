@@ -474,7 +474,7 @@ static qboolean PM_CheckWaterJump(void) {
 		return qfalse;
 	}
 
-	spot[2] += 16;
+	spot[2] += 30; // Tobias CHECK: compensate for the new viewheight to get out of water with ease again (but why do other games not need this?), AND I think this fixes the issue with bots hanging around in water (in q3dm12 BFG room).
 	cont = pm->pointcontents(spot, pm->ps->clientNum);
 
 	if (cont & (CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY)) {
