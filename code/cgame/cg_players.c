@@ -2503,23 +2503,28 @@ void CG_Player(centity_t *cent) {
 	memset(&head, 0, sizeof(head));
 	// get the rotation information
 	CG_PlayerAngles(cent, legs.axis, torso.axis, head.axis);
-// Tobias HACK: make player models (visually) bigger until we have new models...
+// Tobias HACK: make player models (visually) bigger until we have new models... this way we can test our new model specific hit boxes without looking too silly
 	if (!strcmp(ci->modelName, "razor")) {
-		VectorScale(legs.axis[0], 1.41, legs.axis[0]);
-		VectorScale(legs.axis[1], 1.41, legs.axis[1]);
-		VectorScale(legs.axis[2], 1.41, legs.axis[2]);
-		cent->lerpOrigin[2] += 10;
+		VectorScale(legs.axis[0], 1.39, legs.axis[0]);
+		VectorScale(legs.axis[1], 1.39, legs.axis[1]);
+		VectorScale(legs.axis[2], 1.39, legs.axis[2]);
+		cent->lerpOrigin[2] += 9;
 	} else if ((!strcmp(ci->modelName, "janet")) || (!strcmp(ci->modelName, "james"))) {
 		VectorScale(legs.axis[0], 1.12, legs.axis[0]);
 		VectorScale(legs.axis[1], 1.12, legs.axis[1]);
 		VectorScale(legs.axis[2], 1.12, legs.axis[2]);
 		cent->lerpOrigin[2] += 3;
-	} else if (!strcmp(ci->modelName, "mynx") || (!strcmp(ci->modelName, "major")) || (!strcmp(ci->modelName, "pi")) || (!strcmp(ci->modelName, "fritzkrieg")) || (!strcmp(ci->modelName, "morgan")) || (!strcmp(ci->modelName, "sorlag"))) {
+	} else if ((!strcmp(ci->modelName, "major")) || (!strcmp(ci->modelName, "pi")) || (!strcmp(ci->modelName, "morgan")) || (!strcmp(ci->modelName, "sorlag"))) {
 		VectorScale(legs.axis[0], 1.20, legs.axis[0]);
 		VectorScale(legs.axis[1], 1.20, legs.axis[1]);
 		VectorScale(legs.axis[2], 1.20, legs.axis[2]);
 		cent->lerpOrigin[2] += 5;
-	} else if (!strcmp(ci->modelName, "vex")) {
+	} else if ((!strcmp(ci->modelName, "fritzkrieg")) || (!strcmp(ci->modelName, "biker"))) {
+		VectorScale(legs.axis[0], 1.18, legs.axis[0]);
+		VectorScale(legs.axis[1], 1.18, legs.axis[1]);
+		VectorScale(legs.axis[2], 1.18, legs.axis[2]);
+		cent->lerpOrigin[2] += 4;
+	} else if ((!strcmp(ci->modelName, "vex")) || (!strcmp(ci->modelName, "slash"))) {
 		VectorScale(legs.axis[0], 0.97, legs.axis[0]);
 		VectorScale(legs.axis[1], 0.97, legs.axis[1]);
 		VectorScale(legs.axis[2], 0.97, legs.axis[2]);
