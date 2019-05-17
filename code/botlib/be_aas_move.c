@@ -84,8 +84,8 @@ void AAS_InitSettings(void) {
 	aassettings.phys_gravity = LibVarValue("phys_gravity", "800");
 	aassettings.phys_waterfriction = LibVarValue("phys_waterfriction", "1");
 	aassettings.phys_watergravity = LibVarValue("phys_watergravity", "400");
-	aassettings.phys_maxvelocity = LibVarValue("phys_maxvelocity", "320");
-	aassettings.phys_maxwalkvelocity = LibVarValue("phys_maxwalkvelocity", "320");
+	aassettings.phys_maxvelocity = LibVarValue("phys_maxvelocity", "280");
+	aassettings.phys_maxwalkvelocity = LibVarValue("phys_maxwalkvelocity", "280");
 	aassettings.phys_maxcrouchvelocity = LibVarValue("phys_maxcrouchvelocity", "100");
 	aassettings.phys_maxswimvelocity = LibVarValue("phys_maxswimvelocity", "150");
 	aassettings.phys_walkaccelerate = LibVarValue("phys_walkaccelerate", "10");

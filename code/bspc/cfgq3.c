@@ -60,8 +60,8 @@ settings
 	phys_gravity				800
 	phys_waterfriction			1
 	phys_watergravity			400
-	phys_maxvelocity			320
-	phys_maxwalkvelocity		320
+	phys_maxvelocity			280
+	phys_maxwalkvelocity		280
 	phys_maxcrouchvelocity		100
 	phys_maxswimvelocity		150
 	phys_walkaccelerate			10
