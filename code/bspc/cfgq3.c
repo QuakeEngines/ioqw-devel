@@ -79,7 +79,6 @@ settings
 	rs_teleport					50
 	rs_barrierjump				100
 	rs_startcrouch				300
-	rs_startgrapple				500
 	rs_startwalkoffledge		70
 	rs_startjump				300
 	rs_rocketjump				500

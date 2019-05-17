@@ -715,10 +715,8 @@ int main (int argc, char **argv)
 			"   nocsg                                = disables brush chopping\n"
 #ifdef ZTMAUTOARGS
 			"   noforcesidesvisible                  = don't force all sides to be visible\n"
-			"   nograpplereach                       = don't calculate grapple reachabilities\n"
 #else
 			"   forcesidesvisible                    = force all sides to be visible\n"
-			"   grapplereach                         = calculate grapple reachabilities\n"
 #endif
 
 /*			"   noweld     = disables weld\n"

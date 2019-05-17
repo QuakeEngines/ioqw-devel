@@ -62,7 +62,6 @@ typedef struct cfg_s
 	float rs_teleport;
 	float rs_barrierjump;
 	float rs_startcrouch;
-	float rs_startgrapple;
 	float rs_startwalkoffledge;
 	float rs_startjump;
 	float rs_rocketjump;

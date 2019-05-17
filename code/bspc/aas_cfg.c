@@ -78,7 +78,6 @@ fielddef_t cfg_fields[] =
 	{"rs_teleport", CFG_OFS(rs_teleport), FT_FLOAT},
 	{"rs_barrierjump", CFG_OFS(rs_barrierjump), FT_FLOAT},
 	{"rs_startcrouch", CFG_OFS(rs_startcrouch), FT_FLOAT},
-	{"rs_startgrapple", CFG_OFS(rs_startgrapple), FT_FLOAT},
 	{"rs_startwalkoffledge", CFG_OFS(rs_startwalkoffledge), FT_FLOAT},
 	{"rs_startjump", CFG_OFS(rs_startjump), FT_FLOAT},
 	{"rs_rocketjump", CFG_OFS(rs_rocketjump), FT_FLOAT},
