@@ -377,10 +377,10 @@ name:						default:	module(s):		description:
 "phys_walkaccelerate"		"10"		be_aas_move.c	walk acceleration
 "phys_airaccelerate"		"1"			be_aas_move.c	air acceleration
 "phys_swimaccelerate"		"4"			be_aas_move.c	swim acceleration
-"phys_maxstep"				"18"		be_aas_move.c	maximum step height
+"phys_maxstep"				"19"		be_aas_move.c	maximum step height
 "phys_maxsteepness"			"0.7"		be_aas_move.c	maximum floor steepness
-"phys_maxwaterjump"			"19"		be_aas_move.c	maximum waterjump height
-"phys_maxbarrier"			"32"		be_aas_move.c	maximum barrier height
+"phys_maxwaterjump"			"18"		be_aas_move.c	maximum waterjump height
+"phys_maxbarrier"			"33"		be_aas_move.c	maximum barrier height
 "phys_jumpvel"				"270"		be_aas_move.c	jump z velocity
 "phys_falldelta5"			"40"		be_aas_move.c
 "phys_falldelta10"			"60"		be_aas_move.c
@@ -421,8 +421,8 @@ name:						default:	module(s):		description:
 "matchfile"					"match.c"	be_ai_chat.c	file with match strings
 "nochat"					"0"			be_ai_chat.c	disable chats
 "max_messages"				"1024"		be_ai_chat.c	console message heap size
-"max_weaponinfo"			"32"		be_ai_weap.c	maximum number of weapon info
-"max_projectileinfo"		"32"		be_ai_weap.c	maximum number of projectile info
+"max_weaponinfo"			"64"		be_ai_weap.c	maximum number of weapon info
+"max_projectileinfo"		"64"		be_ai_weap.c	maximum number of projectile info
 "max_iteminfo"				"256"		be_ai_goal.c	maximum number of item info
 "max_levelitems"			"256"		be_ai_goal.c	maximum number of level items
 */
