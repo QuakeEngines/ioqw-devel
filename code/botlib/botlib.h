@@ -379,7 +379,7 @@ name:						default:	module(s):		description:
 "phys_swimaccelerate"		"4"			be_aas_move.c	swim acceleration
 "phys_maxstep"				"19"		be_aas_move.c	maximum step height
 "phys_maxsteepness"			"0.7"		be_aas_move.c	maximum floor steepness
-"phys_maxwaterjump"			"18"		be_aas_move.c	maximum waterjump height
+"phys_maxwaterjump"			"12"		be_aas_move.c	maximum waterjump height
 "phys_maxbarrier"			"33"		be_aas_move.c	maximum barrier height
 "phys_jumpvel"				"270"		be_aas_move.c	jump z velocity
 "phys_falldelta5"			"40"		be_aas_move.c

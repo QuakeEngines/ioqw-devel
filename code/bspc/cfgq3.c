@@ -69,7 +69,7 @@ settings
 	phys_swimaccelerate			4
 	phys_maxstep				19
 	phys_maxsteepness			0.7
-	phys_maxwaterjump			18
+	phys_maxwaterjump			12
 	phys_maxbarrier				33
 	phys_jumpvel				270
 	phys_falldelta5				40
