@@ -95,7 +95,7 @@ void AAS_InitSettings(void) {
 	aassettings.phys_maxsteepness = LibVarValue("phys_maxsteepness", "0.7");
 	aassettings.phys_maxwaterjump = LibVarValue("phys_maxwaterjump", "12");
 	aassettings.phys_maxbarrier = LibVarValue("phys_maxbarrier", "43");
-	aassettings.phys_jumpvel = LibVarValue("phys_jumpvel", "270");
+	aassettings.phys_jumpvel = LibVarValue("phys_jumpvel", "200");
 	aassettings.phys_falldelta5 = LibVarValue("phys_falldelta5", "40");
 	aassettings.phys_falldelta10 = LibVarValue("phys_falldelta10", "60");
 	aassettings.rs_waterjump = LibVarValue("rs_waterjump", "400");

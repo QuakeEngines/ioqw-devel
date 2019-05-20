@@ -71,7 +71,7 @@ settings
 	phys_maxsteepness			0.7
 	phys_maxwaterjump			12
 	phys_maxbarrier				43
-	phys_jumpvel				270
+	phys_jumpvel				200
 	phys_falldelta5				40
 	phys_falldelta10			60
 	phys_strafejumping			1
