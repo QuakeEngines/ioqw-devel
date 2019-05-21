@@ -716,7 +716,7 @@ void UI_DrawPlayer(float x, float y, float w, float h, playerInfo_t *pi, int tim
 	vec3_t origin;
 	int renderfx;
 	vec3_t mins = {-16, -16, -24};
-	vec3_t maxs = {16, 16, 32};
+	vec3_t maxs = {16, 16, 56};
 	float len;
 	float xx;
 
