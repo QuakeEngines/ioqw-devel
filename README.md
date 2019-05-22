@@ -15,6 +15,7 @@ Ioid3-qw is licensed under a [modified version of the GNU GPLv3](COPYING.txt#L62
 ## Main features:
 
   * K&R (aka 1TBS/OTBS) formatted code.
+  * Bloom rendering effect.
   * Enhanced BotAI.
   * Rotating gibs.
   * Slightly faster maths.
