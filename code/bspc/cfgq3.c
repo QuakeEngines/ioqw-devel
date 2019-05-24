@@ -89,7 +89,7 @@ settings
 	rs_startelevator			50
 	rs_falldamage5				300
 	rs_falldamage10				500
-	rs_maxfallheight			0 // 0 means no limit
+	rs_maxfallheight			512 // 0 means no limit
 	rs_maxjumpfallheight		450
 	rs_allowladders				0
 } //end settings

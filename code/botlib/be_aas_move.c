@@ -112,7 +112,7 @@ void AAS_InitSettings(void) {
 	aassettings.rs_startelevator = LibVarValue("rs_startelevator", "50");
 	aassettings.rs_falldamage5 = LibVarValue("rs_falldamage5", "300");
 	aassettings.rs_falldamage10 = LibVarValue("rs_falldamage10", "500");
-	aassettings.rs_maxfallheight = LibVarValue("rs_maxfallheight", "0");
+	aassettings.rs_maxfallheight = LibVarValue("rs_maxfallheight", "512");
 	aassettings.rs_maxjumpfallheight = LibVarValue("rs_maxjumpfallheight", "450");
 }
 
