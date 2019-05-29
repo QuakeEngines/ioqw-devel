@@ -1179,12 +1179,11 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 		VectorCopy(start, end);
 
 		end[2] -= 48 + sv_maxbarrier->value;
-
 		trace = AAS_TraceClientBBox(start, end, PRESENCE_CROUCH, entnum);
 		// if solid is found the bot can't walk any further and fall into a gap
 		if (!trace.startsolid) {
 			// if it is a gap
-			if (trace.endpos[2] < startz - sv_maxstep->value - 8) {
+			if (trace.endpos[2] < startz - sv_maxbarrier->value) {
 				VectorCopy(trace.endpos, end);
 
 				end[2] -= 20;
