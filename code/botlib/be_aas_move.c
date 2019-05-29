@@ -992,14 +992,17 @@ int AAS_ClientMovementPrediction(struct aas_clientmove_s *move, int entnum, vec3
 			aas_trace_t gaptrace;
 
 			VectorCopy(org, start);
+
+			start[2] += 24;
+
 			VectorCopy(start, end);
 
 			end[2] -= 48 + aassettings.phys_maxbarrier;
-			gaptrace = AAS_TraceClientBBox(start, end, PRESENCE_CROUCH, -1);
+			gaptrace = AAS_TraceClientBBox(start, end, PRESENCE_CROUCH, entnum);
 			// if solid is found the bot cannot walk any further and will not fall into a gap
 			if (!gaptrace.startsolid) {
 				// if it is a gap (lower than phys_maxbarrier height)
-				if (gaptrace.endpos[2] < org[2] - aassettings.phys_maxstep - 1) { // Tobias CHECK: why phys_maxstep?
+				if (gaptrace.endpos[2] < org[2] - aassettings.phys_maxbarrier) {
 					if (!(AAS_PointContents(end) & CONTENTS_WATER)) {
 						VectorCopy(lastorg, move->endpos);
 						VectorScale(frame_test_vel, 1 / frametime, move->velocity);
