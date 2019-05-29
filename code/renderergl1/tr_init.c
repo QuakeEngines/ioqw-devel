@@ -36,6 +36,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 glconfig_t  glConfig;
 glRefConfig_t glRefConfig;
 
+qboolean    haveClampToEdge = qfalse;
+
 glstate_t	glState;
 
 static void GfxInfo_f( void );
@@ -1246,8 +1248,8 @@ void R_Register( void )
 
 	r_cameraExposure = ri.Cvar_Get( "r_cameraExposure", "1", CVAR_CHEAT );
 	r_bloom = ri.Cvar_Get( "r_bloom", "1", CVAR_ARCHIVE );
-	r_bloomAlpha = ri.Cvar_Get( "r_bloomAlpha", "0.5", CVAR_ARCHIVE );
-	r_bloomRamp = ri.Cvar_Get( "r_bloomRamp", "0.001", CVAR_ARCHIVE );
+	r_bloomAlpha = ri.Cvar_Get( "r_bloomAlpha", "1", CVAR_ARCHIVE );
+	r_bloomRamp = ri.Cvar_Get( "r_bloomRamp", "1", CVAR_ARCHIVE );
 	r_bloomBlur = ri.Cvar_Get( "r_bloomBlur", "0.5", CVAR_ARCHIVE );
 	r_depthPrepass = ri.Cvar_Get( "r_depthPrepass", "1", CVAR_ARCHIVE );
 	r_ssao = ri.Cvar_Get( "r_ssao", "0", CVAR_LATCH | CVAR_ARCHIVE );
@@ -1590,6 +1592,9 @@ void RE_Shutdown( qboolean destroyWindow ) {
 
 		Com_Memset( &glConfig, 0, sizeof( glConfig ) );
 		Com_Memset( &glRefConfig, 0, sizeof( glRefConfig ) );
+
+		haveClampToEdge = qfalse;
+
 		Com_Memset( &glState, 0, sizeof( glState ) );
 	}
 

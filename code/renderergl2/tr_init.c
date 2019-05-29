@@ -36,6 +36,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 glconfig_t  glConfig;
 glRefConfig_t glRefConfig;
 
+qboolean    haveClampToEdge = qfalse;
+
 glstate_t	glState;
 
 static void GfxInfo_f( void );
@@ -1584,6 +1586,9 @@ void RE_Shutdown( qboolean destroyWindow ) {
 
 		Com_Memset( &glConfig, 0, sizeof( glConfig ) );
 		Com_Memset( &glRefConfig, 0, sizeof( glRefConfig ) );
+
+		haveClampToEdge = qfalse;
+
 		Com_Memset( &glState, 0, sizeof( glState ) );
 	}
 
