@@ -1149,13 +1149,19 @@ void MoverBottomCenter(aas_reachability_t *reach, vec3_t bottomcenter) {
 BotGapDistance
 =======================================================================================================================================
 */
-float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
-	int gapdist;
+float BotGapDistance(vec3_t origin, vec3_t velocity, vec3_t hordir, int entnum) {
+	int gapdist, checkdist;
 	vec3_t start, end;
 	aas_trace_t trace;
 
+	// get the current speed
+	checkdist = DotProduct(velocity, hordir);
+
+	if (checkdist < 128) {
+		checkdist = 128;
+	}
 	// do gap checking
-	for (gapdist = 8; gapdist <= 100; gapdist += 8) {
+	for (gapdist = 8; gapdist <= checkdist; gapdist += 8) {
 		VectorMA(origin, gapdist, hordir, start);
 
 		start[2] = origin[2] + 24;
@@ -1176,7 +1182,7 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 					break;
 				}
 				// if a gap is found slow down
-				//botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "BotGapDistance: found a gap at %i.\n", gapdist);
+				botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "BotGapDistance: found a gap at %i (checkdist = %i).\n", gapdist, checkdist);
 				return gapdist;
 			}
 
@@ -1304,7 +1310,7 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type) {
 		// if the bot is not supposed to jump
 		if (!(type & MOVE_JUMP)) {
 			// if there is a gap, try to jump over it
-			if (BotGapDistance(ms->origin, hordir, ms->entitynum) > 0) {
+			if (BotGapDistance(ms->origin, ms->velocity, hordir, ms->entitynum) > 0) {
 				type |= MOVE_JUMP;
 			}
 		}
@@ -1349,13 +1355,13 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type) {
 			// check for nearby gap
 			VectorNormalize2(move.velocity, tmpdir);
 
-			dist = BotGapDistance(move.endpos, tmpdir, ms->entitynum);
+			dist = BotGapDistance(move.endpos, move.velocity, tmpdir, ms->entitynum);
 
 			if (dist > 0) {
 				return qfalse;
 			}
 
-			dist = BotGapDistance(move.endpos, hordir, ms->entitynum);
+			dist = BotGapDistance(move.endpos, move.velocity, hordir, ms->entitynum);
 
 			if (dist > 0) {
 				return qfalse;
@@ -1519,7 +1525,7 @@ bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) 
 		}
 	}
 
-	gapdist = BotGapDistance(ms->origin, hordir, ms->entitynum); // Tobias NOTE: in a perfect world we would not need this! Try to get rid of gap checking here(it works fine, but it looks ugly)
+	gapdist = BotGapDistance(ms->origin, ms->velocity, hordir, ms->entitynum); // Tobias NOTE: in a perfect world we would not need this! Try to get rid of gap checking here(it works fine, but it looks ugly)
 
 	if (ms->moveflags & MFL_WALK) {
 		if (gapdist > 0) {
@@ -1923,7 +1929,7 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach) 
 	hordir[2] = 0;
 	dist = VectorNormalize(hordir);
 	speed = 350;
-	gapdist = BotGapDistance(ms, hordir, ms->entitynum);
+	gapdist = BotGapDistance(ms, ms->velocity, hordir, ms->entitynum);
 	// if pretty close to the start focus on the reachability end
 	if (dist < 50 || (gapdist && gapdist < 50)) {
 		// NOTE: using max speed (400) works best
@@ -1990,7 +1996,7 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach) 
 		VectorMA(reach->start, gapdist, hordir, trace.endpos);
 	}
 
-//	dist1 = BotGapDistance(start, hordir, ms->entitynum);
+//	dist1 = BotGapDistance(start, ms->velocity, hordir, ms->entitynum);
 
 //	if (dist1 && dist1 <= trace.fraction * 80) {
 //		VectorMA(reach->start, dist1 - 20, hordir, trace.endpos);
