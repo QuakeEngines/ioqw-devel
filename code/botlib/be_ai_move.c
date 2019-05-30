@@ -1151,30 +1151,14 @@ BotGapDistance
 */
 float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 	int gapdist;
-	float startz;
 	vec3_t start, end;
 	aas_trace_t trace;
 
 	// do gap checking
-	//startz = origin[2];
-	// this enables walking down stairs more fluidly
-	{
-		VectorCopy(origin, start);
-		VectorCopy(origin, end);
-		end[2] -= 60;
-		trace = AAS_TraceClientBBox(start, end, PRESENCE_CROUCH, entnum);
-
-		if (trace.fraction >= 1) {
-			return 1;
-		}
-
-		startz = trace.endpos[2] + 1;
-	}
-
 	for (gapdist = 8; gapdist <= 100; gapdist += 8) {
 		VectorMA(origin, gapdist, hordir, start);
 
-		start[2] = startz + 24;
+		start[2] = origin[2] + 24;
 
 		VectorCopy(start, end);
 
@@ -1183,7 +1167,7 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 		// if solid is found the bot can't walk any further and fall into a gap
 		if (!trace.startsolid) {
 			// if it is a gap
-			if (trace.endpos[2] < startz - sv_maxbarrier->value) {
+			if (trace.endpos[2] < origin[2] - sv_maxbarrier->value) {
 				VectorCopy(trace.endpos, end);
 
 				end[2] -= 20;
@@ -1196,7 +1180,7 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum) {
 				return gapdist;
 			}
 
-			startz = trace.endpos[2];
+			origin[2] = trace.endpos[2];
 		}
 	}
 
