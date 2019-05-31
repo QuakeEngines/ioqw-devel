@@ -1632,8 +1632,8 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 	hordir[2] = 0;
 	dist = VectorNormalize(hordir);
 
-	if (dist > 200) {
-		dist = 200;
+	if (dist > 100) {
+		dist = 100;
 	}
 
 	BotCheckBlocked(ms, hordir, qtrue, &result);
@@ -1656,13 +1656,13 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 		if (ms->moveflags & MFL_WALK) {
 			speed = 200;
 		} else {
-			speed = 400 - (200 - dist);
+			speed = 400 - (200 - (2 * dist));
 		}
 
 		jumpdist = 0.01f;
 	} else {
 		if (ms->moveflags & MFL_WALK) {
-			speed = 200 + (200 - dist);
+			speed = 200 + (200 - (2 * dist));
 		} else {
 			speed = 400;
 		}
