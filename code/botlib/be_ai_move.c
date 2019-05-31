@@ -1551,46 +1551,6 @@ bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) 
 
 /*
 =======================================================================================================================================
-BotFinishTravel_Walk
-=======================================================================================================================================
-*/
-bot_moveresult_t BotFinishTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) {
-	vec3_t hordir;
-	float dist, speed;
-	bot_moveresult_t_cleared(result);
-
-	// if not on the ground and changed areas... don't walk back!!
-	// (doesn't seem to help)
-	/*
-	ms->areanum = BotFuzzyPointReachabilityArea(ms->origin);
-
-	if (ms->areanum == reach->areanum) {
-#ifndef BASEGAME // Tobias DEBUG
-		botimport.Print(PRT_MESSAGE, "BotFinishTravel_Walk: already in reach area\n");
-#endif // Tobias END
-		return result;
-	}
-	*/
-	// go straight to the reachability end
-	hordir[0] = reach->end[0] - ms->origin[0];
-	hordir[1] = reach->end[1] - ms->origin[1];
-	hordir[2] = 0;
-	dist = VectorNormalize(hordir);
-
-	if (dist > 100) {
-		dist = 100;
-	}
-
-	speed = 400 - (400 - 3 * dist);
-	// elementary action move in direction
-	EA_Move(ms->client, hordir, speed);
-	VectorCopy(hordir, result.movedir);
-
-	return result;
-}
-
-/*
-=======================================================================================================================================
 BotTravel_Crouch
 =======================================================================================================================================
 */
