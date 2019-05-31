@@ -1581,7 +1581,7 @@ BotTravel_BarrierJump
 =======================================================================================================================================
 */
 bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *reach) {
-	float dist, jumpdist, speed, currentspeed;
+	float hordist, dist, jumpdist, speed, currentspeed;
 	vec3_t hordir, cmdmove, end, velocity;
 	bot_moveresult_t_cleared(result);
 	aas_clientmove_t move;
@@ -1590,7 +1590,8 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 	hordir[0] = reach->start[0] - ms->origin[0];
 	hordir[1] = reach->start[1] - ms->origin[1];
 	hordir[2] = 0;
-	dist = VectorNormalize(hordir);
+	hordist = VectorNormalize(hordir);
+	dist = hordist;
 
 	if (dist > 100) {
 		dist = 100;
@@ -1630,7 +1631,7 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 		jumpdist = 0.25f;
 	}
 	// if pretty close to the barrier
-	if (dist < (sv_maxbarrier->value + currentspeed) * jumpdist) {
+	if (hordist < (sv_maxbarrier->value + (currentspeed * 1.1)) * jumpdist) {
 		EA_Jump(ms->client);
 	}
 	// elementary action move in direction
