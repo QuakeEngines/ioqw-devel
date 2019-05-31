@@ -1621,9 +1621,10 @@ BotTravel_BarrierJump
 =======================================================================================================================================
 */
 bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *reach) {
-	float dist, speed;
-	vec3_t hordir;
+	float dist, jumpdist, speed, currentspeed;
+	vec3_t hordir, cmdmove, end, velocity;
 	bot_moveresult_t_cleared(result);
+	aas_clientmove_t move;
 
 	// walk straight to reachability start
 	hordir[0] = reach->start[0] - ms->origin[0];
@@ -1631,20 +1632,49 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 	hordir[2] = 0;
 	dist = VectorNormalize(hordir);
 
-	BotCheckBlocked(ms, hordir, qtrue, &result);
-	// if pretty close to the barrier
-	if (dist < 9) {
-		EA_Jump(ms->client);
-	} else {
-		if (dist > 60) {
-			dist = 60;
-		}
-
-		speed = 360 - (360 - 6 * dist);
-
-		EA_Move(ms->client, hordir, speed);
+	if (dist > 200) {
+		dist = 200;
 	}
 
+	BotCheckBlocked(ms, hordir, qtrue, &result);
+	// get the current speed
+	currentspeed = DotProduct(ms->velocity, hordir);
+	// get command movement
+	VectorScale(hordir, 400, cmdmove);
+	VectorCopy(ms->velocity, velocity);
+	// start point
+	VectorCopy(reach->end, end);
+
+	AAS_PredictClientMovement(&move, ms->entitynum, end, PRESENCE_NORMAL, qtrue, velocity, cmdmove, 2, 2, 0.1f, SE_HITGROUNDDAMAGE|SE_ENTERLAVA|SE_ENTERSLIME|SE_GAP, 0, qfalse);
+	// reduce the speed if the bot will fall into slime, lava or into a gap
+	if (move.stopevent & (SE_HITGROUNDDAMAGE|SE_ENTERLAVA|SE_ENTERSLIME|SE_GAP)) {
+		if (move.stopevent & SE_HITGROUNDDAMAGE) botimport.Print(PRT_MESSAGE, S_COLOR_MAGENTA "HITGROUNDDAMAGE: dist = %f, speed = %f.\n", dist, currentspeed);
+		if (move.stopevent & SE_ENTERSLIME) botimport.Print(PRT_MESSAGE, S_COLOR_GREEN "SLIME: dist = %f, speed = %f.\n", dist, currentspeed);
+		if (move.stopevent & SE_ENTERLAVA) botimport.Print(PRT_MESSAGE, S_COLOR_RED "LAVA: dist = %f, speed = %f.\n", dist, currentspeed);
+		if (move.stopevent & SE_GAP) botimport.Print(PRT_MESSAGE, S_COLOR_CYAN "GAP: dist = %f, speed = %f.\n", dist, currentspeed);
+
+		if (ms->moveflags & MFL_WALK) {
+			speed = 200;
+		} else {
+			speed = 400 - (200 - dist);
+		}
+
+		jumpdist = 0.01f;
+	} else {
+		if (ms->moveflags & MFL_WALK) {
+			speed = 200 + (200 - dist);
+		} else {
+			speed = 400;
+		}
+
+		jumpdist = 0.25f;
+	}
+	// if pretty close to the barrier
+	if (dist < (sv_maxbarrier->value + currentspeed) * jumpdist) {
+		EA_Jump(ms->client);
+	}
+	// elementary action move in direction
+	EA_Move(ms->client, hordir, speed);
 	VectorCopy(hordir, result.movedir);
 
 	return result;
