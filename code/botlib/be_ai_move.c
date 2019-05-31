@@ -1497,7 +1497,7 @@ BotTravel_Walk
 =======================================================================================================================================
 */
 bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) {
-	float dist, speed;
+	float dist, speed, currentspeed;
 	float gapdist;
 	vec3_t hordir;
 	bot_moveresult_t_cleared(result);
@@ -1517,10 +1517,12 @@ bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) 
 		hordir[2] = 0;
 		dist = VectorNormalize(hordir);
 	}
+	// get the current speed
+	currentspeed = DotProduct(ms->velocity, hordir);
 	// if going towards a crouch area
 	if (!(AAS_AreaPresenceType(reach->areanum) & PRESENCE_NORMAL)) {
 		// if pretty close to the reachable area
-		if (dist < 20) {
+		if (dist < (200 + currentspeed) * 0.1f) {
 			EA_Crouch(ms->client);
 		}
 	}
