@@ -1533,8 +1533,6 @@ bot_moveresult_t BotTravel_Walk(bot_movestate_t *ms, aas_reachability_t *reach) 
 		} else {
 			speed = 200;
 		}
-
-		EA_Walk(ms->client);
 	} else {
 		if (gapdist > 0) {
 			speed = 400 - (360 - 2 * gapdist);
