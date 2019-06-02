@@ -1150,7 +1150,7 @@ BotGapDistance
 =======================================================================================================================================
 */
 float BotGapDistance(vec3_t origin, vec3_t hordir, int checkdist, int entnum) {
-	int gapdist, checkdist;
+	int gapdist;
 	vec3_t start, end;
 	aas_trace_t trace;
 
