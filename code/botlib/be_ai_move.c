@@ -1770,9 +1770,10 @@ BotTravel_WalkOffLedge
 =======================================================================================================================================
 */
 bot_moveresult_t BotTravel_WalkOffLedge(bot_movestate_t *ms, aas_reachability_t *reach) {
-	vec3_t hordir, dir;
-	float dist, speed, reachhordist;
+	vec3_t hordir, dir, cmdmove, velocity;
+	float dist, gapdist, speed, reachhordist;
 	bot_moveresult_t_cleared(result);
+	aas_clientmove_t move;
 
 	// check if the bot is blocked by anything
 	VectorSubtract(reach->start, ms->origin, dir);
@@ -1789,17 +1790,86 @@ bot_moveresult_t BotTravel_WalkOffLedge(bot_movestate_t *ms, aas_reachability_t 
 	hordir[2] = 0;
 	dist = VectorNormalize(hordir);
 	// if pretty close to the start focus on the reachability end
-	if (dist < 48) {
+	if (dist < 64) {
 		hordir[0] = reach->end[0] - ms->origin[0];
 		hordir[1] = reach->end[1] - ms->origin[1];
 		hordir[2] = 0;
 
 		VectorNormalize(hordir);
+		// get command movement
+		VectorScale(hordir, 400, cmdmove);
+		VectorCopy(ms->velocity, velocity);
 
+		AAS_PredictClientMovement(&move, ms->entitynum, reach->end, PRESENCE_NORMAL, qtrue, velocity, cmdmove, 2, 2, 0.1f, SE_TOUCHJUMPPAD|SE_HITGROUNDDAMAGE|SE_ENTERSLIME|SE_ENTERLAVA|SE_GAP, 0, qfalse); //qtrue
+		// check for nearby gap
+		gapdist = BotGapDistance(reach->end, hordir, 400, ms->entitynum);
+		// if there is no gap under the ledge
 		if (reachhordist < 20) {
-			speed = 100;
-		} else if (!AAS_HorizontalVelocityForJump(0, reach->start, reach->end, &speed)) {
+			// if there is a gap or a ledge behind the current ledge (like a cascade)
+			if (gapdist > 0) {
+				speed = 200 - (100 - gapdist * 0.25);
+				//		O S   			(origin)O -> (reach)S < 64
+				//--------|
+				//        |
+				//        |
+				//        |
+				//        |E  			(reach)S -> (reach)E < 20
+				//        -------------|	GAP!
+				botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "> BWL Case 1A: reachhordist = %f, dist = %f, speed = %f, found a gap at %f!\n", reachhordist, dist, speed, gapdist);
+			// if the bot wants to walk or if the bot will fall into slime, lava or onto a jumppad when running at full speed
+			} else if (move.stopevent & (SE_TOUCHJUMPPAD|SE_HITGROUNDDAMAGE|SE_ENTERSLIME|SE_ENTERLAVA|SE_GAP) || ms->moveflags & MFL_WALK) {
+				speed = 200;
+				//		O S   			(origin)O -> (reach)S < 64
+				//--------|
+				//        |
+				//        |
+				//        |
+				//        |E  			(reach)S -> (reach)E < 20
+				//        -----------------------------------------
+				if (move.stopevent & SE_HITGROUNDDAMAGE) botimport.Print(PRT_MESSAGE, S_COLOR_MAGENTA "> BWL Case 1B: reachhordist = %f, dist = %f, speed = %f, HITGROUNDDAMAGE!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_ENTERSLIME) botimport.Print(PRT_MESSAGE, S_COLOR_BLACK "> BWL Case 1B: reachhordist = %f, dist = %f, speed = %f, SLIME!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_ENTERLAVA) botimport.Print(PRT_MESSAGE, S_COLOR_BLUE "> BWL Case 1B: reachhordist = %f, dist = %f, speed = %f, LAVA!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_TOUCHJUMPPAD) botimport.Print(PRT_MESSAGE, S_COLOR_CYAN "> BWL Case 1B: reachhordist = %f, dist = %f, speed = %f, JUMPPAD!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_GAP) botimport.Print(PRT_MESSAGE, S_COLOR_RED "> BWL Case 1B: reachhordist = %f, dist = %f, speed = %f, GAP!\n", reachhordist, dist, speed);
+			} else {
+				speed = 400; // Tobias NOTE: this is a default case (no gaps anywhere, no jumppads or lava etc.)
+				botimport.Print(PRT_MESSAGE, S_COLOR_GREEN "> BWL Case 1C: reachhordist = %f, dist = %f, speed = %f, NO PROBLEM AT ALL!\n", reachhordist, dist, speed);
+			}
+		} else if (!AAS_HorizontalVelocityForJump(0, reach->start, reach->end, &speed)) { // Tobias NOTE: very rare, i.e.: ztn3dm2!
 			speed = 400;
+			botimport.Print(PRT_MESSAGE, S_COLOR_MAGENTA "- BWL Case 2: reachhordist = %f, dist = %f, speed = %f, SPECIAL HORIZONTAL!\n", reachhordist, dist, speed);
+		// if there is a gap under the ledge
+		} else {
+			// if there is a gap or a ledge behind the current ledge (like a cascade)
+			if (gapdist > 0) {
+				speed = 400 - (300 - gapdist * 0.75);
+				//		O S   			(origin)O -> (reach)S < 64
+				//--------|
+				//        |
+				//        |
+				//        |
+				//        |  	E		(reach)S -> (reach)E > 20
+				//        |     -------|	GAP!
+				botimport.Print(PRT_MESSAGE, S_COLOR_YELLOW "< BWL Case 3A: reachhordist = %f, dist = %f, speed = %f, found a gap at %f!\n", reachhordist, dist, speed, gapdist);
+			// if the bot wants to walk or if the bot will fall into slime, lava or onto a jumppad when running at full speed
+			} else if (move.stopevent & (SE_TOUCHJUMPPAD|SE_HITGROUNDDAMAGE|SE_ENTERSLIME|SE_ENTERLAVA|SE_GAP) || ms->moveflags & MFL_WALK) { // Tobias NOTE: the q3dm9 side jp case, if 400 then this is useless!
+				speed = 400;
+				if (move.stopevent & SE_HITGROUNDDAMAGE) botimport.Print(PRT_MESSAGE, S_COLOR_MAGENTA "< BWL Case 3B: reachhordist = %f, dist = %f, speed = %f, HITGROUNDDAMAGE!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_ENTERSLIME) botimport.Print(PRT_MESSAGE, S_COLOR_BLACK "< BWL Case 3B: reachhordist = %f, dist = %f, speed = %f, SLIME!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_ENTERLAVA) botimport.Print(PRT_MESSAGE, S_COLOR_BLUE "< BWL Case 3B: reachhordist = %f, dist = %f, speed = %f, LAVA!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_TOUCHJUMPPAD) botimport.Print(PRT_MESSAGE, S_COLOR_CYAN "< BWL Case 3B: reachhordist = %f, dist = %f, speed = %f, JUMPPAD!\n", reachhordist, dist, speed);
+				if (move.stopevent & SE_GAP) botimport.Print(PRT_MESSAGE, S_COLOR_RED "< BWL Case 3B: reachhordist = %f, dist = %f, speed = %f, GAP!\n", reachhordist, dist, speed);
+			} else {
+				speed = 400;
+				//		O S   			(origin)O -> (reach)S < 64
+				//--------|
+				//        |
+				//        |
+				//        |
+				//        |  	E		(reach)S -> (reach)E > 20
+				//        |     -----------------------------------
+				botimport.Print(PRT_MESSAGE, S_COLOR_GREEN "< BWL Case 3C: reachhordist = %f, dist = %f, speed = %f, NO PROBLEM AT ALL!\n", reachhordist, dist, speed);
+			}
 		}
 	} else {
 		if (reachhordist < 20) {
