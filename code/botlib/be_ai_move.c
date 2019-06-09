@@ -1304,7 +1304,7 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type) {
 		// if the bot is not supposed to jump
 		if (!(type & MOVE_JUMP)) {
 			// if there is a gap, try to jump over it
-			if (BotGapDistance(ms->origin, hordir, 512, ms->entitynum) > 0) {
+			if (BotGapDistance(ms->origin, hordir, 400, ms->entitynum) > 0) {
 				type |= MOVE_JUMP;
 			}
 		}
@@ -1349,13 +1349,13 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type) {
 			// check for nearby gap
 			VectorNormalize2(move.velocity, tmpdir);
 
-			dist = BotGapDistance(move.endpos, tmpdir, 512, ms->entitynum);
+			dist = BotGapDistance(move.endpos, tmpdir, 400, ms->entitynum);
 
 			if (dist > 0) {
 				return qfalse;
 			}
 
-			dist = BotGapDistance(move.endpos, hordir, 512, ms->entitynum);
+			dist = BotGapDistance(move.endpos, hordir, 400, ms->entitynum);
 
 			if (dist > 0) {
 				return qfalse;
@@ -1915,7 +1915,7 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach) 
 	hordir[2] = 0;
 	dist = VectorNormalize(hordir);
 	speed = 350;
-	gapdist = BotGapDistance(ms, hordir, 512, ms->entitynum);
+	gapdist = BotGapDistance(ms, hordir, 400, ms->entitynum);
 	// if pretty close to the start focus on the reachability end
 	if (dist < 50 || (gapdist && gapdist < 50)) {
 		// NOTE: using max speed (400) works best
@@ -1982,7 +1982,7 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach) 
 		VectorMA(reach->start, gapdist, hordir, trace.endpos);
 	}
 
-//	dist1 = BotGapDistance(start, hordir, 512, ms->entitynum);
+//	dist1 = BotGapDistance(start, hordir, 400, ms->entitynum);
 
 //	if (dist1 && dist1 <= trace.fraction * 80) {
 //		VectorMA(reach->start, dist1 - 20, hordir, trace.endpos);
