@@ -1128,6 +1128,7 @@ void CG_AddBufferedAnnouncerSound(sfxHandle_t sfx);
 void CG_SetupFrustum(void);
 qboolean CG_CullPoint(vec3_t pt);
 qboolean CG_CullPointAndRadius(const vec3_t pt, vec_t radius);
+qboolean CG_HasBufferedAnnouncerSound(void);
 void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoPlayback);
 // cg_drawtools.c
 // ugly workaround for having it in cg_local.h and ui_shared.h
