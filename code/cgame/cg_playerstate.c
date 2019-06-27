@@ -340,7 +340,7 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 	// check for flag pickup
 	if (cgs.gametype > GT_TEAM) {
 		if ((ps->powerups[PW_REDFLAG] != ops->powerups[PW_REDFLAG] && ps->powerups[PW_REDFLAG]) || (ps->powerups[PW_BLUEFLAG] != ops->powerups[PW_BLUEFLAG] && ps->powerups[PW_BLUEFLAG]) || (ps->powerups[PW_NEUTRALFLAG] != ops->powerups[PW_NEUTRALFLAG] && ps->powerups[PW_NEUTRALFLAG])) {
-			trap_S_StartLocalSound(cgs.media.youHaveFlagSound, CHAN_ANNOUNCER);
+			CG_AddBufferedAnnouncerSound(cgs.media.youHaveFlagSound);
 		}
 	}
 	// lead changes
@@ -349,11 +349,11 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 		if (ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK]) {
 			if (cgs.gametype < GT_TEAM) {
 				if (ps->persistant[PERS_RANK] == 0) {
-					CG_AddBufferedSound(cgs.media.takenLeadSound);
+					CG_AddBufferedAnnouncerSound(cgs.media.takenLeadSound);
 				} else if (ps->persistant[PERS_RANK] == RANK_TIED_FLAG) {
-					CG_AddBufferedSound(cgs.media.tiedLeadSound);
+					CG_AddBufferedAnnouncerSound(cgs.media.tiedLeadSound);
 				} else if ((ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG) == 0) {
-					CG_AddBufferedSound(cgs.media.lostLeadSound);
+					CG_AddBufferedAnnouncerSound(cgs.media.lostLeadSound);
 				}
 			}
 		}
@@ -368,13 +368,13 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 
 		if (!(cg.fraglimitWarnings & 4) && highScore == (cgs.fraglimit - 1)) {
 			cg.fraglimitWarnings |= 1|2|4;
-			CG_AddBufferedSound(cgs.media.oneFragSound);
+			CG_AddBufferedAnnouncerSound(cgs.media.oneFragSound);
 		} else if (cgs.fraglimit > 2 && !(cg.fraglimitWarnings & 2) && highScore == (cgs.fraglimit - 2)) {
 			cg.fraglimitWarnings |= 1|2;
-			CG_AddBufferedSound(cgs.media.twoFragSound);
+			CG_AddBufferedAnnouncerSound(cgs.media.twoFragSound);
 		} else if (cgs.fraglimit > 3 && !(cg.fraglimitWarnings & 1) && highScore == (cgs.fraglimit - 3)) {
 			cg.fraglimitWarnings |= 1;
-			CG_AddBufferedSound(cgs.media.threeFragSound);
+			CG_AddBufferedAnnouncerSound(cgs.media.threeFragSound);
 		}
 	}
 	// timelimit warnings
@@ -385,13 +385,13 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 
 		if (!(cg.timelimitWarnings & 4) && msec > (cgs.timelimit * 60 + 2) * 1000) {
 			cg.timelimitWarnings |= 1|2|4;
-			trap_S_StartLocalSound(cgs.media.suddenDeathSound, CHAN_ANNOUNCER);
+			CG_AddBufferedAnnouncerSound(cgs.media.suddenDeathSound);
 		} else if (!(cg.timelimitWarnings & 2) && msec > (cgs.timelimit - 1) * 60 * 1000) {
 			cg.timelimitWarnings |= 1|2;
-			trap_S_StartLocalSound(cgs.media.oneMinuteSound, CHAN_ANNOUNCER);
+			CG_AddBufferedAnnouncerSound(cgs.media.oneMinuteSound);
 		} else if (cgs.timelimit > 5 && !(cg.timelimitWarnings & 1) && msec > (cgs.timelimit - 5) * 60 * 1000) {
 			cg.timelimitWarnings |= 1;
-			trap_S_StartLocalSound(cgs.media.fiveMinuteSound, CHAN_ANNOUNCER);
+			CG_AddBufferedAnnouncerSound(cgs.media.fiveMinuteSound);
 		}
 	}
 	// if any of the player event bits changed

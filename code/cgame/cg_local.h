@@ -1124,7 +1124,7 @@ void CG_TestModelNextSkin_f(void);
 void CG_TestModelPrevSkin_f(void);
 void CG_ZoomDown_f(void);
 void CG_ZoomUp_f(void);
-void CG_AddBufferedSound(sfxHandle_t sfx);
+void CG_AddBufferedAnnouncerSound(sfxHandle_t sfx);
 void CG_SetupFrustum(void);
 qboolean CG_CullPoint(vec3_t pt);
 qboolean CG_CullPointAndRadius(const vec3_t pt, vec_t radius);
