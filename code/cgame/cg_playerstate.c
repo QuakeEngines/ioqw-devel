@@ -303,10 +303,6 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 			CG_PainEvent(&cg.predictedPlayerEntity, ps->stats[STAT_HEALTH]);
 		}
 	}
-	// if we are going into the intermission, don't start any voices
-	if (cg.intermissionStarted) {
-		return;
-	}
 	// never start any voices during warmup
 	if (cg.warmup) {
 		return;
