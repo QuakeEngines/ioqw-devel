@@ -394,6 +394,10 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 			CG_AddBufferedAnnouncerSound(cgs.media.fiveMinuteSound);
 		}
 	}
+	// reward sounds will only play if no other announcer sounds will be played
+	if (CG_HasBufferedAnnouncerSound()) {
+		return;
+	}
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
