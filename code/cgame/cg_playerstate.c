@@ -288,7 +288,6 @@ CG_CheckLocalSounds
 void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 	int highScore;
 	int health, armor;
-	sfxHandle_t sfx;
 
 	// don't play the sounds if the player just changed teams
 	if (ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM]) {
@@ -411,40 +410,34 @@ void CG_CheckLocalSounds(playerState_t *ps, playerState_t *ops) {
 	// reward excellent sound
 	if (ps->persistant[PERS_EXCELLENT_COUNT] != ops->persistant[PERS_EXCELLENT_COUNT]) {
 		if (ps->persistant[PERS_EXCELLENT_COUNT] == 1) {
-			sfx = cgs.media.firstExcellentSound;
-		} else {
-			sfx = cgs.media.excellentSound;
+			CG_AddBufferedAnnouncerSound(cgs.media.firstExcellentSound);
 		}
-
-		trap_S_StartLocalSound(sfx, CHAN_ANNOUNCER);
+		
+		CG_AddBufferedAnnouncerSound(cgs.media.excellentSound);
 	}
 	// reward impressive sound
 	if (ps->persistant[PERS_IMPRESSIVE_COUNT] != ops->persistant[PERS_IMPRESSIVE_COUNT]) {
 		if (ps->persistant[PERS_IMPRESSIVE_COUNT] == 1) {
-			sfx = cgs.media.firstImpressiveSound;
+			CG_AddBufferedAnnouncerSound(cgs.media.firstImpressiveSound);
 		} else {
-			sfx = cgs.media.impressiveSound;
+			CG_AddBufferedAnnouncerSound(cgs.media.impressiveSound);
 		}
-
-		trap_S_StartLocalSound(sfx, CHAN_ANNOUNCER);
 	}
 	// reward gauntlet sound
 	if (ps->persistant[PERS_GAUNTLET_FRAG_COUNT] != ops->persistant[PERS_GAUNTLET_FRAG_COUNT]) {
 		if (ps->persistant[PERS_GAUNTLET_FRAG_COUNT] == 1) {
-			sfx = cgs.media.firstHumiliationSound;
+			CG_AddBufferedAnnouncerSound(cgs.media.firstHumiliationSound);
 		} else {
-			sfx = cgs.media.humiliationSound;
+			CG_AddBufferedAnnouncerSound(cgs.media.humiliationSound);
 		}
-
-		trap_S_StartLocalSound(sfx, CHAN_ANNOUNCER);
 	}
 	// reward defend sound
 	if (ps->persistant[PERS_DEFEND_COUNT] != ops->persistant[PERS_DEFEND_COUNT]) {
-		trap_S_StartLocalSound(cgs.media.defendSound, CHAN_ANNOUNCER);
+		CG_AddBufferedAnnouncerSound(cgs.media.defendSound);
 	}
 	// reward assist sound
 	if (ps->persistant[PERS_ASSIST_COUNT] != ops->persistant[PERS_ASSIST_COUNT]) {
-		trap_S_StartLocalSound(cgs.media.assistSound, CHAN_ANNOUNCER);
+		CG_AddBufferedAnnouncerSound(cgs.media.assistSound);
 	}
 }
 
