@@ -2538,6 +2538,14 @@ static void CG_DrawWarmup(void) {
 			case 2:
 				trap_S_StartLocalSound(cgs.media.count3Sound, CHAN_ANNOUNCER);
 				break;
+			case 4:
+				if (cgs.gametype > GT_TOURNAMENT && cgs.gametype <= GT_HARVESTER) {
+					trap_S_StartLocalSound(cgs.media.countPrepareTeamSound, CHAN_ANNOUNCER);
+				} else {
+					trap_S_StartLocalSound(cgs.media.countPrepareSound, CHAN_ANNOUNCER);
+				}
+
+				break;
 			default:
 				break;
 		}

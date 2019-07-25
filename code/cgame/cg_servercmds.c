@@ -187,27 +187,8 @@ static void CG_ParseWarmup(void) {
 
 	info = CG_ConfigString(CS_WARMUP);
 	warmup = atoi(info);
-	cg.warmupCount = -1;
-
-	if (warmup == 0 && cg.warmup) {
-
-	} else if (warmup > 0 && cg.warmup <= 0) {
-		if (cgs.gametype > GT_TOURNAMENT && cgs.gametype <= GT_HARVESTER) {
-			if (cg.soundPlaying != cgs.media.countPrepareTeamSound) {
-				CG_AddBufferedAnnouncerSound(-1);
-				CG_AddBufferedAnnouncerSound(cgs.media.countPrepareTeamSound);
-				cg.soundTime = cg.time + 1; // play in next frame
-			}
-		} else {
-			if (cg.soundPlaying != cgs.media.countPrepareSound) {
-				CG_AddBufferedAnnouncerSound(-1);
-				CG_AddBufferedAnnouncerSound(cgs.media.countPrepareSound);
-				cg.soundTime = cg.time + 1; // play in next frame
-			}
-		}
-	}
-
 	cg.warmup = warmup;
+	cg.warmupCount = -1;
 }
 
 /*
@@ -460,10 +441,13 @@ static void CG_MapRestart(void) {
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
 	CG_ClearParticles();
-	// NOTE: do we need this?
+	// Tobias NOTE: do we need this?
 	cg.soundTime = 0;
 	cg.soundBufferIn = 0;
 	cg.soundBufferOut = 0;
+
+	memset(cg.soundBuffer, 0, sizeof(cg.soundBuffer));
+	// Tobias END
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;
 	cg.timelimitWarnings = 0;

@@ -807,12 +807,21 @@ void CG_AddBufferedAnnouncerSound(sfxHandle_t sfx) {
 	if (!sfx) {
 		return;
 	}
-
+	// Tobias NOTE: do we need this?
+	// clear all buffered sounds
+	if (sfx == -1) {
+		cg.soundTime = 0;
+		cg.soundBufferIn = 0;
+		cg.soundBufferOut = 0;
+		memset(cg.soundBuffer, 0, sizeof(cg.soundBuffer));
+		return;
+	}
+	// Tobias END
 	cg.soundBuffer[cg.soundBufferIn] = sfx;
 	cg.soundBufferIn = (cg.soundBufferIn + 1) % MAX_SOUNDBUFFER;
 
 	if (cg.soundBufferIn == cg.soundBufferOut) {
-		cg.soundBufferOut++;
+		cg.soundBufferOut = (cg.soundBufferOut + 1) % MAX_SOUNDBUFFER;
 	}
 }
 
@@ -831,6 +840,17 @@ CG_PlayBufferedAnnouncerSounds
 =======================================================================================================================================
 */
 static void CG_PlayBufferedAnnouncerSounds(void) {
+
+	// clear all buffered sounds
+	if (cg.intermissionStarted || cg.warmupCount < 7) {
+		// Tobias NOTE: do we need this?
+		cg.soundTime = 0;
+		cg.soundBufferIn = 0;
+		cg.soundBufferOut = 0;
+		memset(cg.soundBuffer, 0, sizeof(cg.soundBuffer));
+		// Tobias END
+		return;
+	}
 
 	if (cg.soundTime < cg.time) {
 		if (CG_HasBufferedAnnouncerSound()) {
