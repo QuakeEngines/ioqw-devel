@@ -442,6 +442,10 @@ static void CG_MapRestart(void) {
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
 	CG_ClearParticles();
+	// NOTE: do we need this?
+	cg.soundTime = 0;
+	cg.soundBufferIn = 0;
+	cg.soundBufferOut = 0;
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;
 	cg.timelimitWarnings = 0;
