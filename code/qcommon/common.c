@@ -1391,14 +1391,17 @@ Touch all known used data to make sure it is paged in.
 =======================================================================================================================================
 */
 void Com_TouchMemory(void) {
+#ifndef BASEGAME // Tobias DEBUG
 	int start, end;
+#endif // Tobias END
 	int i, j;
 	unsigned sum;
 	memblock_t *block;
 
 	Z_CheckHeap();
-
+#ifndef BASEGAME // Tobias DEBUG
 	start = Sys_Milliseconds();
+#endif // Tobias END
 	sum = 0;
 	j = hunk_low.permanent >> 2;
 
@@ -1426,9 +1429,9 @@ void Com_TouchMemory(void) {
 			break; // all blocks have been hit
 		}
 	}
-
-	end = Sys_Milliseconds();
 #ifndef BASEGAME // Tobias DEBUG
+	end = Sys_Milliseconds();
+
 	Com_Printf("Com_TouchMemory: %i msec\n", end - start);
 #endif // Tobias END
 }
