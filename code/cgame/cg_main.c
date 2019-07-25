@@ -694,6 +694,8 @@ static void CG_RegisterSounds(void) {
 		cgs.media.redLeadsSound = trap_S_RegisterSound("snd/v/voc_redleads.wav", qtrue);
 		cgs.media.blueLeadsSound = trap_S_RegisterSound("snd/v/voc_blueleads.wav", qtrue);
 		cgs.media.teamsTiedSound = trap_S_RegisterSound("snd/v/voc_teamstied.wav", qtrue);
+		cgs.media.redWinsSound = trap_S_RegisterSound("snd/v/voc_redwins.wav", qtrue);
+		cgs.media.blueWinsSound = trap_S_RegisterSound("snd/v/voc_bluewins.wav", qtrue);
 		cgs.media.captureYourTeamSound = trap_S_RegisterSound("snd/m/fc_yourteam.wav", qtrue);
 		cgs.media.captureOpponentSound = trap_S_RegisterSound("snd/m/fc_enemyteam.wav", qtrue);
 		cgs.media.returnYourTeamSound = trap_S_RegisterSound("snd/m/fr_yourteam.wav", qtrue);
