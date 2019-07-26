@@ -2457,6 +2457,8 @@ static void CG_DrawWarmup(void) {
 
 	sec = cg.warmup;
 
+	cg.warmupCounterShowing = qfalse;
+
 	if (!sec) {
 		return;
 	}
@@ -2518,6 +2520,10 @@ static void CG_DrawWarmup(void) {
 
 	sec = (sec - cg.time) / 1000;
 
+	if (sec < 6) {
+		cg.warmupCounterShowing = qtrue;
+	}
+
 	if (sec < 0) {
 		cg.warmup = 0;
 		sec = 0;
@@ -2527,7 +2533,6 @@ static void CG_DrawWarmup(void) {
 
 	if (sec != cg.warmupCount) {
 		cg.warmupCount = sec;
-		cg.warmupCounterShowing = qtrue;
 
 		switch (sec) {
 			case 0:
@@ -2548,7 +2553,6 @@ static void CG_DrawWarmup(void) {
 
 				break;
 			default:
-				cg.warmupCounterShowing = qfalse;
 				break;
 		}
 	}
