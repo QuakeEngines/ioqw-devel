@@ -5330,17 +5330,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 			}
 
 			trap_GetConfigstring(CS_SOUNDS + state->eventParm, buf, sizeof(buf));
-			/*
-			if (!strcmp(buf, "snd/m/flagret_red.wav")) {
-				// red flag is returned
-				bs->redflagstatus = 0;
-				bs->flagstatuschanged = qtrue;
-			} else if (!strcmp(buf, "snd/m/flagret_blu.wav")) {
-				// blue flag is returned
-				bs->blueflagstatus = 0;
-				bs->flagstatuschanged = qtrue;
-			} else
-			*/
+
 			if (!strcmp(buf, "snd/i/kam_sp.wav")) {
 				// the kamikaze respawned so don't avoid it
 				BotDontAvoid(bs, "Kamikaze");
