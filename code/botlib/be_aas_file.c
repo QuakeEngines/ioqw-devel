@@ -343,10 +343,8 @@ char *AAS_LoadAASLump(fileHandle_t fp, int offset, int length, int *lastoffset, 
 	// allocate memory
 	buf = (char *)GetClearedHunkMemory(length + 1);
 	// read the data
-	if (length) {
-		botimport.FS_Read(buf, length, fp);
-		*lastoffset += length;
-	}
+	botimport.FS_Read(buf, length, fp);
+	*lastoffset += length;
 
 	return buf;
 }
@@ -375,9 +373,8 @@ int AAS_LoadAASFile(char *filename) {
 	fileHandle_t fp;
 	aas_header_t header;
 	int offset, length, lastoffset;
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "trying to load %s\n", filename);
-#endif // Tobias END
 	// dump current loaded aas file
 	AAS_DumpAASData();
 	// open the file

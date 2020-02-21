@@ -1351,11 +1351,11 @@ void CL_Disconnect(qboolean showMainMenu) {
 
 	clc.state = CA_DISCONNECTED;
 	// allow cheats locally
-	Cvar_Set("sv_cheats", "1");
+	Cvar_Set("sv_cheats", "0");
 	// not connected to a pure server anymore
 	cl_connectedToPureServer = qfalse;
 #ifdef USE_VOIP
-	// not connected to voip server anymore.
+	// not connected to voip server anymore
 	clc.voipEnabled = qfalse;
 #endif
 	// stop recording any video
@@ -2184,9 +2184,9 @@ void CL_ServersResponsePacket(const netadr_t *from, msg_t *msg, qboolean extende
 	int numservers;
 	byte *buffptr;
 	byte *buffend;
-#ifndef BASEGAME // Tobias DEBUG
+
 	Com_Printf("CL_ServersResponsePacket from %s\n", NET_AdrToStringwPort(*from));
-#endif // Tobias END
+
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
 		cls.numglobalservers = 0;

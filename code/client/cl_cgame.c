@@ -796,9 +796,8 @@ void CL_InitCGame(void) {
 	// we will send a usercmd this frame, which will cause the server to send us the first snapshot
 	clc.state = CA_PRIMED;
 	t2 = Sys_Milliseconds();
-#ifndef BASEGAME // Tobias DEBUG
+
 	Com_Printf("CL_InitCGame: %5.2f seconds\n", (t2 - t1) / 1000.0);
-#endif // Tobias END
 	// have the renderer touch all its images, so they are present on the card even if the driver does deferred loading
 	re.EndRegistration();
 	// make sure everything is paged in

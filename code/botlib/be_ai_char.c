@@ -41,7 +41,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "be_interface.h"
 #include "be_ai_char.h"
 
-#define MAX_CHARACTERISTICS 80
+#define MAX_CHARACTERISTICS 64 // Tobias TODO: Reduce this to an adequate amount after we've added all the necessary characteristics.
 
 #define CT_INTEGER	1
 #define CT_FLOAT	2
@@ -61,12 +61,16 @@ typedef struct bot_characteristic_s {
 } bot_characteristic_t;
 // a bot character
 typedef struct bot_character_s {
+	bot_characteristic_t c[MAX_CHARACTERISTICS];
 	char filename[MAX_QPATH];
 	float skill;
-	bot_characteristic_t c[1]; // variable sized
+	int refcnt;
+	int reftime;
 } bot_character_t;
 
-bot_character_t *botcharacters[MAX_CLIENTS + 1];
+#define MAX_HANDLES (MAX_CLIENTS * 2)
+
+bot_character_t *botcharacters[MAX_HANDLES + 1];
 
 /*
 =======================================================================================================================================
@@ -75,7 +79,7 @@ BotCharacterFromHandle
 */
 bot_character_t *BotCharacterFromHandle(int handle) {
 
-	if (handle <= 0 || handle > MAX_CLIENTS) {
+	if (handle <= 0 || handle > MAX_HANDLES) {
 		botimport.Print(PRT_FATAL, "character handle %d out of range\n", handle);
 		return NULL;
 	}
@@ -86,6 +90,29 @@ bot_character_t *BotCharacterFromHandle(int handle) {
 	}
 
 	return botcharacters[handle];
+}
+
+/*
+=======================================================================================================================================
+BotReferenceHandle
+=======================================================================================================================================
+*/
+static bot_character_t *BotReferenceHandle(int handle, int refmod) {
+	bot_character_t *ch;
+
+	if (handle > 0 && handle <= MAX_HANDLES) {
+		ch = botcharacters[handle];
+
+		if (ch) {
+			ch->refcnt += refmod;
+
+			if (ch->refcnt == 0) {
+				ch->reftime = botimport.MilliSeconds();
+			}
+		}
+	}
+
+	return NULL;
 }
 
 /*
@@ -139,7 +166,7 @@ BotFreeCharacter2
 */
 void BotFreeCharacter2(int handle) {
 
-	if (handle <= 0 || handle > MAX_CLIENTS) {
+	if (handle <= 0 || handle > MAX_HANDLES) {
 		botimport.Print(PRT_FATAL, "character handle %d out of range\n", handle);
 		return;
 	}
@@ -161,12 +188,59 @@ BotFreeCharacter
 =======================================================================================================================================
 */
 void BotFreeCharacter(int handle) {
+	bot_character_t *ch;
+
+	ch = BotCharacterFromHandle(handle);
+
+	if (ch) {
+		if (ch->refcnt > 0) {
+			ch->refcnt--;
+		}
+
+		if (ch->refcnt) {
+			return; // we can't release referenced characters
+		}
+	} else {
+		return;
+	}
 
 	if (!LibVarGetValue("bot_reloadcharacters")) {
 		return;
 	}
 
 	BotFreeCharacter2(handle);
+}
+
+/*
+=======================================================================================================================================
+BotReleaseUnreferencedHandle
+=======================================================================================================================================
+*/
+static int BotReleaseUnreferencedHandle(void) {
+	const bot_character_t *ch;
+	int handle, now, t, r;
+
+	r = 0;
+	t = 0;
+	now = botimport.MilliSeconds();
+
+	for (handle = 1; handle < MAX_HANDLES; handle++) {
+		ch = botcharacters[handle];
+
+		if (ch && ch->refcnt == 0) {
+			if (r == 0 || now - ch->reftime > t) {
+				t = now - ch->reftime;
+				r = handle;
+			}
+		}
+	}
+
+	if (r != 0) {
+		BotFreeCharacter2(r);
+		return r;
+	}
+
+	return 0;
 }
 
 /*
@@ -218,7 +292,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill) {
 		return NULL;
 	}
 
-	ch = (bot_character_t *)GetClearedMemory(sizeof(bot_character_t) + MAX_CHARACTERISTICS * sizeof(bot_characteristic_t));
+	ch = (bot_character_t *)GetClearedMemory(sizeof(*ch));
 
 	strcpy(ch->filename, charfile);
 
@@ -238,7 +312,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill) {
 				return NULL;
 			}
 			// if it's the correct skill
-			if (skill < 0 || token.intvalue == skill) {
+			if (skill < 0 || (int)token.intvalue == skill) {
 				foundcharacter = qtrue;
 				ch->skill = token.intvalue;
 
@@ -257,7 +331,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill) {
 
 					index = token.intvalue;
 
-					if (index < 0 || index > MAX_CHARACTERISTICS) {
+					if (index < 0 || index >= MAX_CHARACTERISTICS) {
 						SourceError(source, "characteristic index out of range [0, %d]", MAX_CHARACTERISTICS);
 						FreeSource(source);
 						BotFreeCharacterStrings(ch);
@@ -352,7 +426,7 @@ BotFindCachedCharacter
 int BotFindCachedCharacter(char *charfile, float skill) {
 	int handle;
 
-	for (handle = 1; handle <= MAX_CLIENTS; handle++) {
+	for (handle = 1; handle <= MAX_HANDLES; handle++) {
 		if (!botcharacters[handle]) {
 			continue;
 		}
@@ -373,29 +447,31 @@ BotLoadCachedCharacter
 int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 	int handle, cachedhandle, intskill;
 	bot_character_t *ch = NULL;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime;
 
-	starttime = Sys_MilliSeconds();
-#endif // Tobias END
+	starttime = botimport.MilliSeconds();
+#endif // DEBUG
 	// find a free spot for a character
-	for (handle = 1; handle <= MAX_CLIENTS; handle++) {
+	for (handle = 1; handle <= MAX_HANDLES; handle++) {
 		if (!botcharacters[handle]) {
 			break;
 		}
 	}
 
-	if (handle > MAX_CLIENTS) {
-		return 0;
+	if (handle > MAX_HANDLES) {
+		handle = BotReleaseUnreferencedHandle();
+
+		if (!handle) {
+			return 0;
+		}
 	}
 	// try to load a cached character with the given skill
 	if (!reload) {
 		cachedhandle = BotFindCachedCharacter(charfile, skill);
 
 		if (cachedhandle) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
-#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -406,9 +482,12 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
-#ifndef BASEGAME // Tobias DEBUG
-		botimport.Print(PRT_MESSAGE, "loaded skill %d in %d msec from %s\n", intskill, Sys_MilliSeconds() - starttime, charfile);
-#endif // Tobias END
+		botimport.Print(PRT_MESSAGE, "loaded skill %d from %s\n", intskill, charfile);
+#ifdef DEBUG
+		if (botDeveloper) {
+			botimport.Print(PRT_MESSAGE, "skill %d loaded in %d msec from %s\n", intskill, botimport.MilliSeconds() - starttime, charfile);
+		}
+#endif // DEBUG
 		return handle;
 	}
 
@@ -419,9 +498,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(DEFAULT_CHARACTER, skill);
 
 		if (cachedhandle) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached default skill %d from %s\n", intskill, charfile);
-#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -430,9 +507,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded default skill %d from %s\n", intskill, charfile);
-#endif // Tobias END
 		return handle;
 	}
 
@@ -441,9 +516,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(charfile, -1);
 
 		if (cachedhandle) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
-#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -452,9 +525,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded skill %f from %s\n", ch->skill, charfile);
-#endif // Tobias END
 		return handle;
 	}
 
@@ -463,9 +534,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 		cachedhandle = BotFindCachedCharacter(DEFAULT_CHARACTER, -1);
 
 		if (cachedhandle) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_MESSAGE, "loaded cached default skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
-#endif // Tobias END
 			return cachedhandle;
 		}
 	}
@@ -474,14 +543,11 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload) {
 
 	if (ch) {
 		botcharacters[handle] = ch;
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded default skill %f from %s\n", ch->skill, charfile);
-#endif // Tobias END
 		return handle;
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_WARNING, "couldn't load any skill from %s\n", charfile);
-#endif // Tobias END
 	// couldn't load any character
 	return 0;
 }
@@ -495,11 +561,18 @@ int BotLoadCharacterSkill(char *charfile, float skill) {
 	int ch, defaultch;
 
 	defaultch = BotLoadCachedCharacter(DEFAULT_CHARACTER, skill, qfalse);
+
+	BotReferenceHandle(defaultch, 1);
+
 	ch = BotLoadCachedCharacter(charfile, skill, LibVarGetValue("bot_reloadcharacters"));
+
+	BotReferenceHandle(ch, 1);
 
 	if (defaultch && ch) {
 		BotDefaultCharacteristics(botcharacters[ch], botcharacters[defaultch]);
 	}
+
+	BotReferenceHandle(defaultch, -1);
 
 	return ch;
 }
@@ -512,7 +585,7 @@ BotInterpolateCharacters
 int BotInterpolateCharacters(int handle1, int handle2, float desiredskill) {
 	bot_character_t *ch1, *ch2, *out;
 	int i, handle;
-	float scale;
+	float scale, v1, v2;
 
 	ch1 = BotCharacterFromHandle(handle1);
 	ch2 = BotCharacterFromHandle(handle2);
@@ -521,17 +594,21 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill) {
 		return 0;
 	}
 	// find a free spot for a character
-	for (handle = 1; handle <= MAX_CLIENTS; handle++) {
+	for (handle = 1; handle <= MAX_HANDLES; handle++) {
 		if (!botcharacters[handle]) {
 			break;
 		}
 	}
 
-	if (handle > MAX_CLIENTS) {
-		return 0;
+	if (handle > MAX_HANDLES) {
+		handle = BotReleaseUnreferencedHandle();
+
+		if (!handle) {
+			return 0;
+		}
 	}
 
-	out = (bot_character_t *)GetClearedMemory(sizeof(bot_character_t) + MAX_CHARACTERISTICS * sizeof(bot_characteristic_t));
+	out = (bot_character_t *)GetClearedMemory(sizeof(*out));
 	out->skill = desiredskill;
 
 	strcpy(out->filename, ch1->filename);
@@ -540,9 +617,17 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill) {
 	scale = (float)(desiredskill - ch1->skill) / (ch2->skill - ch1->skill);
 
 	for (i = 0; i < MAX_CHARACTERISTICS; i++) {
-		if (ch1->c[i].type == CT_FLOAT && ch2->c[i].type == CT_FLOAT) {
+		if (ch1->c[i].type == CT_FLOAT && (ch2->c[i].type == CT_FLOAT || ch2->c[i].type == CT_INTEGER)) {
 			out->c[i].type = CT_FLOAT;
-			out->c[i].value._float = ch1->c[i].value._float + (ch2->c[i].value._float - ch1->c[i].value._float) * scale;
+			v1 = ch1->c[i].value._float;
+			// convert second value from integer to float
+			if (ch2->c[i].type == CT_INTEGER) {
+				v2 = ch2->c[i].value.integer;
+			} else {
+				v2 = ch2->c[i].value._float;
+			}
+
+			out->c[i].value._float = v1 + (v2 - v1) * scale;
 		} else if (ch1->c[i].type == CT_INTEGER) {
 			out->c[i].type = CT_INTEGER;
 			out->c[i].value.integer = ch1->c[i].value.integer;
@@ -578,9 +663,8 @@ int BotLoadCharacter(char *charfile, float skill) {
 	handle = BotFindCachedCharacter(charfile, skill);
 
 	if (handle) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
-#endif // Tobias END
+		BotReferenceHandle(handle, 1);
 		return handle;
 	}
 
@@ -614,9 +698,14 @@ int BotLoadCharacter(char *charfile, float skill) {
 	// interpolate between the two skills
 	handle = BotInterpolateCharacters(firstskill, secondskill, skill);
 
+	BotReferenceHandle(firstskill, -1);
+	BotReferenceHandle(secondskill, -1);
+
 	if (!handle) {
 		return 0;
 	}
+
+	BotReferenceHandle(handle, 1);
 	// write the character to the log file
 	BotDumpCharacter(botcharacters[handle]);
 
@@ -638,16 +727,12 @@ int CheckCharacteristicIndex(int character, int index) {
 	}
 
 	if (index < 0 || index >= MAX_CHARACTERISTICS) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d does not exist\n", index);
-#endif // Tobias END
 		return qfalse;
 	}
 
 	if (!ch->c[index].type) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not initialized\n", index);
-#endif // Tobias END
 		return qfalse;
 	}
 
@@ -679,9 +764,7 @@ float Characteristic_Float(int character, int index) {
 		return ch->c[index].value._float;
 	// cannot convert a string pointer to a float
 	} else {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not a float\n", index);
-#endif // Tobias END
 		return 0;
 	}
 
@@ -704,9 +787,7 @@ float Characteristic_BFloat(int character, int index, float min, float max) {
 	}
 
 	if (min > max) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "cannot bound characteristic %d between %f and %f\n", index, min, max);
-#endif // Tobias END
 		return 0;
 	}
 
@@ -747,9 +828,7 @@ int Characteristic_Integer(int character, int index) {
 	} else if (ch->c[index].type == CT_FLOAT) {
 		return (int)ch->c[index].value._float;
 	} else {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not an integer\n", index);
-#endif // Tobias END
 		return 0;
 	}
 
@@ -772,9 +851,7 @@ int Characteristic_BInteger(int character, int index, int min, int max) {
 	}
 
 	if (min > max) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "cannot bound characteristic %d between %d and %d\n", index, min, max);
-#endif // Tobias END
 		return 0;
 	}
 
@@ -810,12 +887,9 @@ void Characteristic_String(int character, int index, char *buf, int size) {
 	}
 	// an integer will be converted to a float
 	if (ch->c[index].type == CT_STRING) {
-		strncpy(buf, ch->c[index].value.string, size - 1);
-		buf[size - 1] = '\0';
+		Q_strncpyz(buf, ch->c[index].value.string, size);
 	} else {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "characteristic %d is not a string\n", index);
-#endif // Tobias END
 	}
 }
 
@@ -827,7 +901,7 @@ BotShutdownCharacters
 void BotShutdownCharacters(void) {
 	int handle;
 
-	for (handle = 1; handle <= MAX_CLIENTS; handle++) {
+	for (handle = 1; handle <= MAX_HANDLES; handle++) {
 		if (botcharacters[handle]) {
 			BotFreeCharacter2(handle);
 		}

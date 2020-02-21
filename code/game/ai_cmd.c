@@ -46,7 +46,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "../../ui/menudef.h" // for the voice chats
 
 int notleader[MAX_CLIENTS];
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 /*
 =======================================================================================================================================
 BotPrintTeamGoal
@@ -658,7 +658,7 @@ void BotMatch_HelpAccompany(bot_state_t *bs, bot_match_t *match) {
 		// remember last ordered task
 		BotRememberLastOrderedTask(bs);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -712,7 +712,7 @@ void BotMatch_DefendKeyArea(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -758,7 +758,7 @@ void BotMatch_GetItem(bot_state_t *bs, bot_match_t *match) {
 	bs->teamgoal_time = FloatTime() + TEAM_GETITEM_TIME;
 
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -860,7 +860,7 @@ void BotMatch_Camp(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -907,7 +907,7 @@ void BotMatch_Patrol(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -959,7 +959,7 @@ void BotMatch_GetFlag(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1005,7 +1005,7 @@ void BotMatch_AttackEnemyBase(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1049,7 +1049,7 @@ void BotMatch_Harvest(bot_state_t *bs, bot_match_t *match) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1095,7 +1095,7 @@ void BotMatch_RushBase(bot_state_t *bs, bot_match_t *match) {
 	bs->rushbaseaway_time = 0;
 
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1188,7 +1188,7 @@ void BotMatch_ReturnFlag(bot_state_t *bs, bot_match_t *match) {
 	bs->rushbaseaway_time = 0;
 
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1899,7 +1899,7 @@ void BotMatch_Kill(bot_state_t *bs, bot_match_t *match) {
 	bs->teamgoal_time = FloatTime() + TEAM_KILL_SOMEONE;
 
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }

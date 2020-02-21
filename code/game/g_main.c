@@ -298,9 +298,8 @@ void G_FindTeams(void) {
 			}
 		}
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	G_Printf("%i teams with %i entities\n", c, c2);
-#endif // Tobias END
 }
 
 /*

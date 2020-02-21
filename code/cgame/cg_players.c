@@ -705,6 +705,7 @@ qboolean CG_RegisterSkin(const char *name, cgSkin_t *skin, qboolean append) {
 				Q_strncpyz(shaderName, token, sizeof(shaderName));
 
 				if (!token[0]) {
+					// end of line
 					break;
 				}
 
@@ -747,6 +748,7 @@ static qboolean CG_RegisterClientSkin(clientInfo_t *ci, const char *teamName, co
 	legsSkin = torsoSkin = headSkin = qfalse;
 	/*
 	Com_sprintf(filename, sizeof(filename), "models/players/%s/%slower_%s.skin", modelName, teamName, skinName);
+
 	ci->legsSkin = trap_R_RegisterSkin(filename);
 
 	if (!ci->legsSkin) {
@@ -754,6 +756,7 @@ static qboolean CG_RegisterClientSkin(clientInfo_t *ci, const char *teamName, co
 	}
 
 	Com_sprintf(filename, sizeof(filename), "models/players/%s/%supper_%s.skin", modelName, teamName, skinName);
+
 	ci->torsoSkin = trap_R_RegisterSkin(filename);
 
 	if (!ci->torsoSkin) {
@@ -808,6 +811,7 @@ static qboolean CG_RegisterClientModelname(clientInfo_t *ci, const char *modelNa
 	}
 
 	Com_sprintf(filename, sizeof(filename), "models/players/%s/lower.md3", modelName);
+
 	ci->legsModel = trap_R_RegisterModel(filename);
 
 	if (!ci->legsModel) {
@@ -816,6 +820,7 @@ static qboolean CG_RegisterClientModelname(clientInfo_t *ci, const char *modelNa
 	}
 
 	Com_sprintf(filename, sizeof(filename), "models/players/%s/upper.md3", modelName);
+
 	ci->torsoModel = trap_R_RegisterModel(filename);
 
 	if (!ci->torsoModel) {
@@ -2622,7 +2627,7 @@ void CG_Player(centity_t *cent) {
 		return;
 	}
 
-	torso.customSkin = legs.customSkin;
+	torso.customSkin = legs.customSkin; // Tobias CHECK: legs?
 
 	VectorCopy(cent->lerpOrigin, torso.lightingOrigin);
 	CG_PositionRotatedEntityOnTag(&torso, &legs, ci->legsModel, "tag_torso");
@@ -2852,7 +2857,7 @@ void CG_Player(centity_t *cent) {
 		return;
 	}
 
-	head.customSkin = legs.customSkin;
+	head.customSkin = legs.customSkin; // Tobias CHECK: legs?
 
 	VectorCopy(cent->lerpOrigin, head.lightingOrigin);
 	CG_PositionRotatedEntityOnTag(&head, &torso, ci->torsoModel, "tag_head");

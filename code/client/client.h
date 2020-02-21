@@ -338,34 +338,31 @@ extern cvar_t *cl_inGameVideo;
 extern cvar_t *cl_lanForcePackets;
 extern cvar_t *cl_autoRecordDemo;
 extern cvar_t *cl_consoleKeys;
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 extern cvar_t *cl_drawping;
 extern cvar_t *cl_drawpingfontsize;
 extern cvar_t *cl_drawpingposx;
 extern cvar_t *cl_drawpingposy;
 extern cvar_t *cl_drawpingfirstinterval;
 extern cvar_t *cl_drawpingsecondinterval;
-
 extern cvar_t *cl_drawfps;
 extern cvar_t *cl_drawfpsfontsize;
 extern cvar_t *cl_drawfpsposx;
 extern cvar_t *cl_drawfpsposy;
 extern cvar_t *cl_drawfpsinterval;
-
 extern cvar_t *cl_drawsnaps;
 extern cvar_t *cl_drawsnapsfontsize;
 extern cvar_t *cl_drawsnapsposx;
 extern cvar_t *cl_drawsnapsposy;
 extern cvar_t *cl_drawsnapsfirstinterval;
 extern cvar_t *cl_drawsnapssecondinterval;
-
 extern cvar_t *cl_drawpackets;
 extern cvar_t *cl_drawpacketsposx;
 extern cvar_t *cl_drawpacketsposy;
 extern cvar_t *cl_drawpacketsfontsize;
 extern cvar_t *cl_drawpacketsfirstinterval;
 extern cvar_t *cl_drawpacketssecondinterval;
-#endif // Tobias END
+// Tobias END
 #ifdef USE_MUMBLE
 extern cvar_t *cl_useMumble;
 extern cvar_t *cl_mumbleScale;
@@ -513,7 +510,7 @@ qboolean CL_CloseAVI(void);
 qboolean CL_VideoRecording(void);
 // cl_main.c
 void CL_WriteDemoMessage(msg_t *msg, int headerBytes);
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 #include "../renderergl1/tr_local.h"
 /*
 	Most new console variables and functions are called via this.
@@ -726,4 +723,4 @@ extern cvar_t *Cvar_FindVar(const char *var_name);
 #define DEFAULT_FTGL_LIB "libftgl.so.2" // Debian
 #define ALTERNATIVE_FTGL_LIB "libftgl.so.0" // RPM based?
 #endif
-#endif // Tobias END
+// Tobias END

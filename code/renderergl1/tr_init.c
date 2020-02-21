@@ -1329,7 +1329,7 @@ void R_Register( void )
 	r_dlightBacks = ri.Cvar_Get( "r_dlightBacks", "1", CVAR_ARCHIVE );
 	r_finish = ri.Cvar_Get ("r_finish", "1", CVAR_ARCHIVE);
 	r_textureMode = ri.Cvar_Get( "r_textureMode", "GL_LINEAR_MIPMAP_LINEAR", CVAR_ARCHIVE );
-	r_swapInterval = ri.Cvar_Get( "r_swapInterval", "0", // Tobias DEBUG: r_swapInterval "1" causes issues on Win 10
+	r_swapInterval = ri.Cvar_Get( "r_swapInterval", "1", // Tobias NOTE: r_swapInterval "1" still causes issues on Win 10?
 					CVAR_ARCHIVE | CVAR_LATCH );
 	r_gamma = ri.Cvar_Get( "r_gamma", "1", CVAR_ARCHIVE );
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE );

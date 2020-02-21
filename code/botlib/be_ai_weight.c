@@ -338,11 +338,11 @@ weightconfig_t *ReadWeightConfig(char *filename) {
 	source_t *source;
 	fuzzyseperator_t *fs;
 	weightconfig_t *config = NULL;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime;
 
-	starttime = Sys_MilliSeconds();
-#endif // Tobias END
+	starttime = botimport.MilliSeconds();
+#endif // DEBUG
 	if (!LibVarGetValue("bot_reloadcharacters")) {
 		avail = -1;
 
@@ -469,11 +469,13 @@ weightconfig_t *ReadWeightConfig(char *filename) {
 	}
 	// free the source at the end of a pass
 	FreeSource(source);
-#ifndef BASEGAME // Tobias DEBUG
 	// if the file was located in a pak file
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
-	botimport.Print(PRT_MESSAGE, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime);
-#endif // Tobias END
+#ifdef DEBUG
+	if (botDeveloper) {
+		botimport.Print(PRT_MESSAGE, "weights loaded in %d msec\n", botimport.MilliSeconds() - starttime);
+	}
+#endif // DEBUG
 	if (!LibVarGetValue("bot_reloadcharacters")) {
 		weightFileList[avail] = config;
 	}
@@ -680,7 +682,7 @@ qboolean WriteWeightConfig(char *filename, weightconfig_t *config) {
 FindFuzzyWeight
 =======================================================================================================================================
 */
-int FindFuzzyWeight(weightconfig_t *wc, char *name) {
+int FindFuzzyWeight(weightconfig_t *wc, const char *name) {
 	int i;
 
 	for (i = 0; i < wc->numweights; i++) {

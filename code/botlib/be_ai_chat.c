@@ -342,7 +342,7 @@ void BotQueueConsoleMessage(int chatstate, int type, char *message) {
 	m->time = AAS_Time();
 	m->type = type;
 
-	Q_strncpyz(m->message, message, MAX_MESSAGE_SIZE);
+	Q_strncpyz(m->message, message, sizeof(m->message));
 
 	m->next = NULL;
 
@@ -374,7 +374,7 @@ int BotNextConsoleMessage(int chatstate, bot_consolemessage_t *cm) {
 		return 0;
 	}
 
-	if ((firstmsg = cs->firstmessage)) {
+	if ((firstmsg = cs->firstmessage) != NULL) { // Tobias CHECK (ec)
 		cm->handle = firstmsg->handle;
 		cm->time = firstmsg->time;
 		cm->type = firstmsg->type;
@@ -621,7 +621,7 @@ void BotDumpSynonymList(bot_synonymlist_t *synlist) {
 BotLoadSynonyms
 =======================================================================================================================================
 */
-bot_synonymlist_t *BotLoadSynonyms(char *filename) {
+bot_synonymlist_t *BotLoadSynonyms(const char *filename) {
 	int pass, size, contextlevel, numsynonyms;
 	unsigned long int context, contextstack[32];
 	char *ptr = NULL;
@@ -714,14 +714,15 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename) {
 
 						StripDoubleQuotes(token.string);
 
-						if (strlen(token.string) <= 0) {
+						len = (int)strlen(token.string);
+
+						if (len == 0) {
 							SourceError(source, "empty string");
 							FreeSource(source);
 							return NULL;
 						}
 
-						len = strlen(token.string) + 1;
-						len = PAD(len, sizeof(long));
+						len = PAD(len + 1, sizeof(long));
 						size += sizeof(bot_synonym_t) + len;
 
 						if (pass && ptr) {
@@ -1014,16 +1015,17 @@ void BotDumpRandomStringList(bot_randomlist_t *randomlist) {
 BotLoadRandomStrings
 =======================================================================================================================================
 */
-bot_randomlist_t *BotLoadRandomStrings(char *filename) {
+bot_randomlist_t *BotLoadRandomStrings(const char *filename) {
 	int pass, size;
 	char *ptr = NULL, chatmessagestring[MAX_MESSAGE_SIZE];
 	source_t *source;
 	token_t token;
 	bot_randomlist_t *randomlist, *lastrandom, *random;
 	bot_randomstring_t *randomstring;
-#ifndef BASEGAME // Tobias DEBUG
-	int starttime = Sys_MilliSeconds();
-#endif // Tobias END
+	size_t len;
+#ifdef DEBUG
+	int starttime = botimport.MilliSeconds();
+#endif // DEBUG
 	size = 0;
 	randomlist = NULL;
 	random = NULL;
@@ -1046,8 +1048,6 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename) {
 		lastrandom = NULL; // last
 
 		while (PC_ReadToken(source, &token)) {
-			size_t len;
-
 			if (token.type != TT_NAME) {
 				SourceError(source, "unknown random %s", token.string);
 				FreeSource(source);
@@ -1110,10 +1110,10 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename) {
 	}
 
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
-#ifndef BASEGAME // Tobias DEBUG
-	botimport.Print(PRT_MESSAGE, "random strings %d msec\n", Sys_MilliSeconds() - starttime);
+#ifdef DEBUG
+	botimport.Print(PRT_MESSAGE, "random strings %d msec\n", botimport.MilliSeconds() - starttime);
 	//BotDumpRandomStringList(randomlist);
-#endif // Tobias END
+#endif // DEBUG
 	return randomlist;
 }
 
@@ -1348,7 +1348,7 @@ void BotFreeMatchTemplates(bot_matchtemplate_t *mt) {
 BotLoadMatchTemplates
 =======================================================================================================================================
 */
-bot_matchtemplate_t *BotLoadMatchTemplates(char *matchfile) {
+bot_matchtemplate_t *BotLoadMatchTemplates(const char *matchfile) {
 	source_t *source;
 	token_t token;
 	bot_matchtemplate_t *matchtemplate, *matches, *lastmatch;
@@ -1524,7 +1524,7 @@ int BotFindMatch(char *str, bot_match_t *match, unsigned long int context) {
 	int i;
 	bot_matchtemplate_t *ms;
 
-	Q_strncpyz(match->string, str, MAX_MESSAGE_SIZE);
+	Q_strncpyz(match->string, str, sizeof(match->string));
 	// remove any trailing enters
 	while (strlen(match->string) && match->string[strlen(match->string) - 1] == '\n') {
 		match->string[strlen(match->string) - 1] = '\0';
@@ -1568,8 +1568,7 @@ void BotMatchVariable(bot_match_t *match, int variable, char *buf, int size) {
 		}
 
 		assert(match->variables[variable].offset >= 0);
-		strncpy(buf, &match->string[(int)match->variables[variable].offset], size - 1);
-		buf[size - 1] = '\0';
+		Q_strncpyz(buf, &match->string[(int)match->variables[variable].offset], size);
 	} else {
 		strcpy(buf, "");
 	}
@@ -1931,7 +1930,7 @@ void BotCheckValidReplyChatKeySet(source_t *source, bot_replychatkey_t *keys) {
 BotLoadReplyChat
 =======================================================================================================================================
 */
-bot_replychat_t *BotLoadReplyChat(char *filename) {
+bot_replychat_t *BotLoadReplyChat(const char *filename) {
 	char chatmessagestring[MAX_MESSAGE_SIZE];
 	char namebuffer[MAX_MESSAGE_SIZE];
 	source_t *source;
@@ -2137,11 +2136,11 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname) {
 	bot_chat_t *chat = NULL;
 	bot_chattype_t *chattype = NULL;
 	bot_chatmessage_t *chatmessage = NULL;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime;
 
-	starttime = Sys_MilliSeconds();
-#endif // Tobias END
+	starttime = botimport.MilliSeconds();
+#endif // DEBUG
 	size = 0;
 	foundchat = qfalse;
 	// a bot chat is parsed in two phases
@@ -2209,7 +2208,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname) {
 
 						if (pass && ptr) {
 							chattype = (bot_chattype_t *)ptr;
-							Q_strncpyz(chattype->name, token.string, MAX_CHATTYPE_NAME);
+							Q_strncpyz(chattype->name, token.string, sizeof(chattype->name));
 							chattype->firstchatmessage = NULL;
 							// add the chat type to the chat
 							chattype->next = chat->types;
@@ -2286,9 +2285,9 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname) {
 	if (botDeveloper) {
 		BotCheckInitialChatIntegrety(chat);
 	}
-#ifndef BASEGAME // Tobias DEBUG
-	botimport.Print(PRT_MESSAGE, "initial chats loaded in %d msec\n", Sys_MilliSeconds() - starttime);
-#endif // Tobias END
+#ifdef DEBUG
+	botimport.Print(PRT_MESSAGE, "initial chats loaded in %d msec\n", botimport.MilliSeconds() - starttime);
+#endif // DEBUG
 	// character was read successfully
 	return chat;
 }
@@ -2412,7 +2411,7 @@ int BotExpandChatMessage(char *outmessage, char *message, unsigned long mcontext
 						msgptr++;
 					}
 
-					if (num > MAX_MATCHVARIABLES) {
+					if (num >= MAX_MATCHVARIABLES) {
 						botimport.Print(PRT_ERROR, "BotConstructChat: message %s variable %d out of range\n", message, num);
 						return qfalse;
 					}
@@ -2646,9 +2645,9 @@ void BotInitialChat(int chatstate, char *type, int mcontext, char *var0, char *v
 	message = BotChooseInitialChatMessage(cs, type);
 	// if there's no message of the given type
 	if (!message) {
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 		botimport.Print(PRT_MESSAGE, "no chat messages of type %s\n", type);
-#endif // Tobias END
+#endif // DEBUG
 		return;
 	}
 
@@ -3013,9 +3012,7 @@ void BotGetChatMessage(int chatstate, char *buf, int size) {
 	}
 
 	BotRemoveTildes(cs->chatmessage);
-	strncpy(buf, cs->chatmessage, size - 1);
-
-	buf[size - 1] = '\0';
+	Q_strncpyz(buf, cs->chatmessage, size);
 	// clear the chat message from the state
 	strcpy(cs->chatmessage, "");
 }
@@ -3063,11 +3060,7 @@ void BotSetChatName(int chatstate, char *name, int client) {
 
 	cs->client = client;
 
-	Com_Memset(cs->name, 0, sizeof(cs->name));
-
-	strncpy(cs->name, name, sizeof(cs->name) - 1);
-
-	cs->name[sizeof(cs->name) - 1] = '\0';
+	Q_strncpyz(cs->name, name, sizeof(cs->name));
 }
 
 /*
@@ -3143,10 +3136,10 @@ BotSetupChatAI
 =======================================================================================================================================
 */
 int BotSetupChatAI(void) {
-	char *file;
-#ifndef BASEGAME // Tobias DEBUG
-	int starttime = Sys_MilliSeconds();
-#endif // Tobias END
+	const char *file;
+#ifdef DEBUG
+	int starttime = botimport.MilliSeconds();
+#endif // DEBUG
 	file = LibVarString("synfile", "syn.c");
 	synonyms = BotLoadSynonyms(file);
 	file = LibVarString("rndfile", "rnd.c");
@@ -3160,9 +3153,9 @@ int BotSetupChatAI(void) {
 	}
 
 	InitConsoleMessageHeap();
-#ifndef BASEGAME // Tobias DEBUG
-	botimport.Print(PRT_MESSAGE, "setup chat AI %d msec\n", Sys_MilliSeconds() - starttime);
-#endif // Tobias END
+#ifdef DEBUG
+	botimport.Print(PRT_MESSAGE, "setup chat AI %d msec\n", botimport.MilliSeconds() - starttime);
+#endif // DEBUG
 	return BLERR_NOERROR;
 }
 

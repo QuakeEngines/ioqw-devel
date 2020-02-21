@@ -28,8 +28,14 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 // command number + 12 arguments
 #define MAX_VMMAIN_ARGS 13
 // Max number of arguments to pass from a vm to engine's syscall handler function for the vm.
+// Tobias CHECK: Warning!
+/*
 // syscall number + 15 arguments
 #define MAX_VMSYSCALL_ARGS 16
+*/
+// qvm syscall number + vm syscall number + 15 args
+#define MAX_VMSYSCALL_ARGS 17
+// Tobias END
 // don't change, this is hardcoded into x86 VMs, opStack protection relies on this
 #define OPSTACK_SIZE 1024
 #define OPSTACK_MASK (OPSTACK_SIZE - 1)

@@ -28,7 +28,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "q_shared.h"
 #include "qcommon.h"
-#include "../zlib-1.2.11/unzip.h"
+#include "unzip.h"
 
 /*
 =======================================================================================================================================

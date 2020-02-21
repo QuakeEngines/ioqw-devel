@@ -807,7 +807,7 @@ void BotInterbreeding(void) {
 	trap_Cvar_SetValue("bot_reloadcharacters", 1);
 	// add a number of bots using the desired bot character
 	for (i = 0; i < bot_interbreedbots.integer; i++) {
-		trap_Cmd_ExecuteText(EXEC_INSERT, va("addbot %s 4 free %i %s%d\n", bot_interbreedchar.string, i * 50, bot_interbreedchar.string, i));
+		trap_Cmd_ExecuteText(EXEC_INSERT, va("addbot %s 4 free %i %s %d\n", bot_interbreedchar.string, i * 50, bot_interbreedchar.string, i));
 	}
 
 	trap_Cvar_Set("bot_interbreedchar", "");
@@ -1897,12 +1897,14 @@ int BotInitLibrary(void) {
 	if (strlen(buf)) {
 		trap_BotLibVarSet("nochat", buf);
 	}
+// Tobias DEBUG
 	// no shooting
 	trap_Cvar_VariableStringBuffer("bot_noshoot", buf, sizeof(buf));
 
 	if (strlen(buf)) {
 		trap_BotLibVarSet("bot_noshoot", buf);
 	}
+// Tobias END
 	// visualize jump pads
 	trap_Cvar_VariableStringBuffer("bot_visualizejumppads", buf, sizeof(buf));
 
@@ -1959,14 +1961,14 @@ BotAISetup
 int BotAISetup(int restart) {
 	int errnum;
 
-	trap_Cvar_Register(&bot_thinktime, "bot_thinktime", "100", 0);
-	trap_Cvar_Register(&bot_memorydump, "bot_memorydump", "0", 0);
-	trap_Cvar_Register(&bot_saveroutingcache, "bot_saveroutingcache", "0", 0);
-	trap_Cvar_Register(&bot_pause, "bot_pause", "0", 0);
-	trap_Cvar_Register(&bot_report, "bot_report", "2", 0);
-	trap_Cvar_Register(&bot_testsolid, "bot_testsolid", "0", 0);
-	trap_Cvar_Register(&bot_testclusters, "bot_testclusters", "0", 0);
-	trap_Cvar_Register(&bot_developer, "bot_developer", "0", 0);
+	trap_Cvar_Register(&bot_thinktime, "bot_thinktime", "100", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_memorydump, "bot_memorydump", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_saveroutingcache, "bot_saveroutingcache", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_pause, "bot_pause", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_report, "bot_report", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_testsolid, "bot_testsolid", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_testclusters, "bot_testclusters", "0", CVAR_CHEAT);
+	trap_Cvar_Register(&bot_developer, "bot_developer", "0", CVAR_CHEAT);
 // Tobias DEBUG
 	trap_Cvar_Register(&bot_shownodechanges, "bot_shownodechanges", "0", 0);
 	trap_Cvar_Register(&bot_teambluestrategy, "bot_teambluestrategy", "0", 0);

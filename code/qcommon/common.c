@@ -40,8 +40,8 @@ int demo_protocols[] = {67, 66, 0};
 #define MAX_NUM_ARGVS 50
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS 56
-#define DEF_COMHUNKMEGS 768
-#define DEF_COMZONEMEGS 512
+#define DEF_COMHUNKMEGS /*1280*/1536 // Spearmint's renderer 2 needs more memory
+#define DEF_COMZONEMEGS 128
 #define DEF_COMHUNKMEGS_S XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S XSTRING(DEF_COMZONEMEGS)
 
@@ -1391,17 +1391,14 @@ Touch all known used data to make sure it is paged in.
 =======================================================================================================================================
 */
 void Com_TouchMemory(void) {
-#ifndef BASEGAME // Tobias DEBUG
 	int start, end;
-#endif // Tobias END
 	int i, j;
 	unsigned sum;
 	memblock_t *block;
 
 	Z_CheckHeap();
-#ifndef BASEGAME // Tobias DEBUG
+
 	start = Sys_Milliseconds();
-#endif // Tobias END
 	sum = 0;
 	j = hunk_low.permanent >> 2;
 
@@ -1429,11 +1426,10 @@ void Com_TouchMemory(void) {
 			break; // all blocks have been hit
 		}
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	end = Sys_Milliseconds();
 
 	Com_Printf("Com_TouchMemory: %i msec\n", end - start);
-#endif // Tobias END
 }
 
 /*
@@ -1718,9 +1714,8 @@ void Hunk_Clear(void) {
 
 	hunk_permanent = &hunk_low;
 	hunk_temp = &hunk_high;
-#ifndef BASEGAME // Tobias DEBUG
+
 	Com_Printf("Hunk_Clear: reset the hunk ok\n");
-#endif // Tobias END
 	VM_Clear();
 #ifdef HUNK_DEBUG
 	hunkblocks = NULL;
@@ -2608,11 +2603,11 @@ void Com_Init(char *commandLine) {
 #if idppc_altivec
 	com_altivec = Cvar_Get("com_altivec", "1", CVAR_ARCHIVE);
 #endif
-	com_maxfps = Cvar_Get("com_maxfps", "500", CVAR_ARCHIVE); // Tobias DEBUG
+	com_maxfps = Cvar_Get("com_maxfps", "60", CVAR_ARCHIVE);
 	com_singlePlayerActive = Cvar_Get("ui_singlePlayerActive", "0", CVAR_SYSTEMINFO|CVAR_ROM);
 	com_blood = Cvar_Get("com_blood", "1", CVAR_ARCHIVE);
 	com_logfile = Cvar_Get("logfile", "0", CVAR_TEMP);
-	com_timescale = Cvar_Get("timescale", "1", CVAR_SYSTEMINFO); // Tobias DEBUG
+	com_timescale = Cvar_Get("timescale", "1", CVAR_CHEAT|CVAR_SYSTEMINFO);
 	com_fixedtime = Cvar_Get("fixedtime", "0", CVAR_CHEAT);
 	com_showtrace = Cvar_Get("com_showtrace", "0", CVAR_CHEAT);
 	com_speeds = Cvar_Get("com_speeds", "0", 0);

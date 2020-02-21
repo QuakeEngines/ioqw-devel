@@ -150,7 +150,7 @@ bot_weaponstate_t *BotWeaponStateFromHandle(int handle) {
 
 	return botweaponstates[handle];
 }
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG_AI_WEAP
 /*
 =======================================================================================================================================
 DumpWeaponConfig
@@ -176,13 +176,13 @@ void DumpWeaponConfig(weaponconfig_t *wc) {
 		Log_Flush();
 	}
 }
-#endif // Tobias END
+#endif // DEBUG_AI_WEAP
 /*
 =======================================================================================================================================
 LoadWeaponConfig
 =======================================================================================================================================
 */
-weaponconfig_t *LoadWeaponConfig(char *filename) {
+weaponconfig_t *LoadWeaponConfig(const char *filename) {
 	int max_weaponinfo, max_projectileinfo;
 	token_t token;
 	char path[MAX_QPATH];
@@ -191,20 +191,20 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 	weaponconfig_t *wc;
 	weaponinfo_t weaponinfo;
 
-	max_weaponinfo = (int)LibVarValue("max_weaponinfo", "32");
+	max_weaponinfo = (int)LibVarValue("max_weaponinfo", "64");
 
 	if (max_weaponinfo < 0) {
 		botimport.Print(PRT_ERROR, "max_weaponinfo = %d\n", max_weaponinfo);
-		max_weaponinfo = 32;
-		LibVarSet("max_weaponinfo", "32");
+		max_weaponinfo = 64;
+		LibVarSet("max_weaponinfo", "64");
 	}
 
-	max_projectileinfo = (int)LibVarValue("max_projectileinfo", "32");
+	max_projectileinfo = (int)LibVarValue("max_projectileinfo", "64");
 
 	if (max_projectileinfo < 0) {
 		botimport.Print(PRT_ERROR, "max_projectileinfo = %d\n", max_projectileinfo);
-		max_projectileinfo = 32;
-		LibVarSet("max_projectileinfo", "32");
+		max_projectileinfo = 64;
+		LibVarSet("max_projectileinfo", "64");
 	}
 
 	Q_strncpyz(path, filename, sizeof(path));
@@ -212,9 +212,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 	source = LoadSourceFile(path);
 
 	if (!source) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_ERROR, "counldn't load %s\n", path);
-#endif // Tobias END
 		return NULL;
 	}
 	// initialize weapon config
@@ -246,9 +244,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 			wc->weaponinfo[weaponinfo.number].valid = qtrue;
 		} else if (!strcmp(token.string, "projectileinfo")) {
 			if (wc->numprojectiles >= max_projectileinfo) {
-#ifndef BASEGAME // Tobias DEBUG
 				botimport.Print(PRT_ERROR, "more than %d projectiles defined in %s\n", max_projectileinfo, path);
-#endif // Tobias END
 				FreeMemory(wc);
 				FreeSource(source);
 				return NULL;
@@ -264,9 +260,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 
 			wc->numprojectiles++;
 		} else {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_ERROR, "unknown definition %s in %s\n", token.string, path);
-#endif // Tobias END
 			FreeMemory(wc);
 			FreeSource(source);
 			return NULL;
@@ -281,17 +275,13 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 		}
 
 		if (!wc->weaponinfo[i].name[0]) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_ERROR, "weapon %d has no name in %s\n", i, path);
-#endif // Tobias END
 			FreeMemory(wc);
 			return NULL;
 		}
 
 		if (!wc->weaponinfo[i].projectile[0]) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_ERROR, "weapon %s has no projectile in %s\n", wc->weaponinfo[i].name, path);
-#endif // Tobias END
 			FreeMemory(wc);
 			return NULL;
 		}
@@ -304,9 +294,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 		}
 
 		if (j == wc->numprojectiles) {
-#ifndef BASEGAME // Tobias DEBUG
 			botimport.Print(PRT_ERROR, "weapon %s uses undefined projectile in %s\n", wc->weaponinfo[i].name, path);
-#endif // Tobias END
 			FreeMemory(wc);
 			return NULL;
 		}
@@ -315,9 +303,8 @@ weaponconfig_t *LoadWeaponConfig(char *filename) {
 	if (!wc->numweapons) {
 		botimport.Print(PRT_WARNING, "no weapon info loaded\n");
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
-#endif // Tobias END
 	return wc;
 }
 
@@ -381,9 +368,7 @@ int BotLoadWeaponWeights(int weaponstate, char *filename) {
 	ws->weaponweightconfig = ReadWeightConfig(filename);
 
 	if (!ws->weaponweightconfig) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_FATAL, "couldn't load weapon config %s\n", filename);
-#endif // Tobias END
 		return BLERR_CANNOTLOADWEAPONWEIGHTS;
 	}
 
@@ -527,20 +512,18 @@ BotSetupWeaponAI
 =======================================================================================================================================
 */
 int BotSetupWeaponAI(void) {
-	char *file;
+	const char *file;
 
 	file = LibVarString("weaponconfig", "weapons.c");
 	weaponconfig = LoadWeaponConfig(file);
 
 	if (!weaponconfig) {
-#ifndef BASEGAME // Tobias DEBUG
 		botimport.Print(PRT_FATAL, "couldn't load the weapon config\n");
-#endif // Tobias END
 		return BLERR_CANNOTLOADWEAPONCONFIG;
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG_AI_WEAP
 	DumpWeaponConfig(weaponconfig);
-#endif // Tobias END
+#endif // DEBUG_AI_WEAP
 	return BLERR_NOERROR;
 }
 

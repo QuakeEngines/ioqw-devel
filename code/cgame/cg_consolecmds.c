@@ -143,7 +143,7 @@ static void CG_LoadHud_f(void) {
 	hudSet = buff;
 
 	if (hudSet[0] == '\0') {
-		hudSet = "ui/hud.txt";
+		hudSet = "ui/ui1/hud.txt";
 	}
 
 	CG_LoadMenus(hudSet);

@@ -192,10 +192,10 @@ void SP_team_CTF_bluespawn(gentity_t *ent);
 void SP_team_blueobelisk(gentity_t *ent);
 void SP_team_redobelisk(gentity_t *ent);
 void SP_team_neutralobelisk(gentity_t *ent);
+void SP_item_botroam(gentity_t *ent){};
 void SP_dlight(gentity_t *ent);
 void SP_corona(gentity_t *ent);
 void SP_props_skyportal(gentity_t *ent);
-void SP_item_botroam(gentity_t *ent) {}
 
 spawn_t spawns[] = {
 	// info entities don't do anything at all, but provide positional information for things controlled by other processes
@@ -257,10 +257,10 @@ spawn_t spawns[] = {
 	{"team_redobelisk", SP_team_redobelisk},
 	{"team_blueobelisk", SP_team_blueobelisk},
 	{"team_neutralobelisk", SP_team_neutralobelisk},
+	{"item_botroam", SP_item_botroam},
 	{"dlight", SP_dlight},
 	{"corona", SP_corona},
 	{"props_skyportal", SP_props_skyportal},
-	{"item_botroam", SP_item_botroam},
 	{NULL, 0}
 };
 
@@ -528,7 +528,7 @@ void SP_worldspawn(void) {
 
 	G_SpawnString("gravity", "800", &s);
 	trap_Cvar_Set("g_gravity", s);
-#if 0 // ZTM: Currently game doesn't need the tracemap
+#if 0 // ZTM: currently game doesn't need the tracemap
 	level.mapcoordsValid = qfalse;
 	// top left/bottom right
 	if (G_SpawnVector2D("mapcoordsmins", "-128 128", level.mapcoordsMins) && G_SpawnVector2D("mapcoordsmaxs", "128 -128", level.mapcoordsMaxs)) {

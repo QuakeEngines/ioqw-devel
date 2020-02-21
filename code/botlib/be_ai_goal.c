@@ -236,7 +236,7 @@ void BotMutateGoalFuzzyLogic(int goalstate, float range) {
 LoadItemConfig
 =======================================================================================================================================
 */
-itemconfig_t *LoadItemConfig(char *filename) {
+itemconfig_t *LoadItemConfig(const char *filename) {
 	int max_iteminfo;
 	token_t token;
 	char path[MAX_QPATH];
@@ -309,9 +309,8 @@ itemconfig_t *LoadItemConfig(char *filename) {
 	if (!ic->numiteminfo) {
 		botimport.Print(PRT_WARNING, "no item info loaded\n");
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
-#endif // Tobias END
 	return ic;
 }
 
@@ -508,10 +507,10 @@ void BotInitInfoEntities(void) {
 		}
 	}
 
-#ifndef BASEGAME // Tobias DEBUG
-	botimport.Print(PRT_MESSAGE, "%d map locations\n", numlocations);
-	botimport.Print(PRT_MESSAGE, "%d camp spots\n", numcampspots);
-#endif // Tobias END
+	if (botDeveloper) {
+		botimport.Print(PRT_MESSAGE, "%d map locations\n", numlocations);
+		botimport.Print(PRT_MESSAGE, "%d camp spots\n", numcampspots);
+	}
 }
 
 /*
@@ -663,9 +662,8 @@ void BotInitLevelItems(void) {
 
 		AddLevelItemToList(li);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "found %d level items\n", numlevelitems);
-#endif // Tobias END
 }
 
 /*
@@ -971,7 +969,7 @@ int BotGetNextCampSpotGoal(int num, bot_goal_t *goal) {
 
 	return 0;
 }
-
+#if 0
 /*
 =======================================================================================================================================
 BotFindEntityForLevelItem
@@ -990,6 +988,9 @@ void BotFindEntityForLevelItem(levelitem_t *li) {
 	}
 
 	for (ent = AAS_NextEntity(0); ent; ent = AAS_NextEntity(ent)) {
+		if (g_entities[ent].s.eType != ET_ITEM) {
+			continue;
+		}
 		// get the model index of the entity
 		modelindex = AAS_EntityModelindex(ent);
 
@@ -1014,7 +1015,7 @@ void BotFindEntityForLevelItem(levelitem_t *li) {
 		}
 	}
 }
-
+#endif
 /*
 =======================================================================================================================================
 BotUpdateEntityItems
@@ -1128,9 +1129,9 @@ void BotUpdateEntityItems(void) {
 						// also update the goal area number
 						li->goalareanum = AAS_BestReachableArea(li->origin, ic->iteminfo[li->iteminfo].mins, ic->iteminfo[li->iteminfo].maxs, li->goalorigin);
 					}
-#ifndef BASEGAME // Tobias DEBUG
-					botimport.Print(PRT_MESSAGE, "linked item %s to an entity\n", ic->iteminfo[li->iteminfo].classname);
-#endif // Tobias END
+#ifdef DEBUG
+					Log_Write("linked item %s to an entity", ic->iteminfo[li->iteminfo].classname);
+#endif // DEBUG
 					break;
 				}
 			}
@@ -1343,14 +1344,17 @@ int BotChooseLTGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 	// if the bot is in solid or if the area the bot is in has no reachability links
 	if (!areanum || !AAS_AreaReachability(areanum)) {
 		// use the last valid area the bot was in
-		areanum = gs->lastreachabilityarea;
+		if (gs->lastreachabilityarea > 0) {
+			areanum = gs->lastreachabilityarea;
+			//botimport.Print(PRT_MESSAGE, S_COLOR_BLUE "(SG 1 of 3) gs->lastreachabilityarea > 0 CASE LTG: areanum: %d\n", areanum);
+		}
 	}
-	// remember the last area with reachabilities the bot was in
-	gs->lastreachabilityarea = areanum;
 	// if still in solid
 	if (!areanum) {
 		return qfalse;
 	}
+	// remember the last area with reachabilities the bot was in
+	gs->lastreachabilityarea = areanum;
 	// the item configuration
 	ic = itemconfig;
 
@@ -1448,9 +1452,9 @@ int BotChooseLTGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 				goal.iteminfo = 0;
 				// push the goal on the stack
 				BotPushGoal(goalstate, &goal);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 				botimport.Print(PRT_MESSAGE, "chosen roam goal area %d\n", goal.areanum);
-#endif // Tobias END
+#endif // DEBUG
 				return qtrue;
 			}
 		}
@@ -1527,15 +1531,21 @@ int BotChooseNBGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 	areanum = BotReachabilityArea(origin, gs->client);
 	// if the bot is in solid or if the area the bot is in has no reachability links
 	if (!areanum || !AAS_AreaReachability(areanum)) {
+#ifdef DEBUG
+		botimport.Print(PRT_MESSAGE, "Bot is in solid or area has no reachability links: %d %d\n", areanum, gs->lastreachabilityarea);
+#endif
 		// use the last valid area the bot was in
-		areanum = gs->lastreachabilityarea;
+		if (gs->lastreachabilityarea > 0) {
+			areanum = gs->lastreachabilityarea;
+			//botimport.Print(PRT_MESSAGE, S_COLOR_CYAN "(SG 2 of 3) gs->lastreachabilityarea > 0 CASE NBG: areanum: %d\n", areanum);
+		}
 	}
-	// remember the last area with reachabilities the bot was in
-	gs->lastreachabilityarea = areanum;
 	// if still in solid
 	if (!areanum) {
 		return qfalse;
 	}
+	// remember the last area with reachabilities the bot was in
+	gs->lastreachabilityarea = areanum;
 
 	if (ltg) {
 		ltg_time = AAS_AreaTravelTimeToGoalArea(areanum, origin, ltg->areanum, travelflags);
@@ -1631,6 +1641,11 @@ int BotChooseNBGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 					}
 				}
 			}
+#ifdef DEBUG
+			else {
+				botimport.Print(PRT_MESSAGE, "Can't reach %d\n", li->entitynum);
+			}
+#endif
 		}
 	}
 	// if no goal item found
@@ -1872,7 +1887,7 @@ BotSetupGoalAI
 =======================================================================================================================================
 */
 int BotSetupGoalAI(void) {
-	char *filename;
+	const char *filename;
 
 	// check if teamplay is on
 	g_gametype = LibVarValue("g_gametype", "0");

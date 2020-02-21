@@ -27,6 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 **************************************************************************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../qcommon/surfaceflags.h" // for CONTENTS_WATER, CONTENTS_LAVA, CONTENTS_SLIME etc.
 #include "l_log.h"
 #include "l_libvar.h"
 #include "l_memory.h"
@@ -66,28 +67,12 @@ int botlibsetup = qfalse;
 
 /*
 =======================================================================================================================================
-ValidClientNumber
-=======================================================================================================================================
-*/
-qboolean ValidClientNumber(int num, char *str) {
-
-	if (num < 0 || num > botlibglobals.maxclients) {
-		// weird: the disabled stuff results in a crash
-		botimport.Print(PRT_ERROR, "%s: invalid client number %d, [0, %d]\n", str, num, botlibglobals.maxclients);
-		return qfalse;
-	}
-
-	return qtrue;
-}
-
-/*
-=======================================================================================================================================
 ValidEntityNumber
 =======================================================================================================================================
 */
-qboolean ValidEntityNumber(int num, char *str) {
+static qboolean ValidEntityNumber(int num, const char *str) {
 
-	if (num < 0 || num > botlibglobals.maxentities) {
+	if (num < 0 || (unsigned)num > botlibglobals.maxentities) {
 		botimport.Print(PRT_ERROR, "%s: invalid entity number %d, [0, %d]\n", str, num, botlibglobals.maxentities);
 		return qfalse;
 	}
@@ -100,7 +85,7 @@ qboolean ValidEntityNumber(int num, char *str) {
 BotLibSetup
 =======================================================================================================================================
 */
-qboolean BotLibSetup(char *str) {
+static qboolean BotLibSetup(const char *str) {
 
 	if (!botlibglobals.botlibsetup) {
 		botimport.Print(PRT_ERROR, "%s: bot library used before being setup\n", str);
@@ -123,12 +108,14 @@ int Export_BotLibSetup(void) {
 	memset(&botlibglobals, 0, sizeof(botlibglobals));
 	// initialize byte swapping (litte endian etc.)
 	//Swap_Init();
-#ifndef BASEGAME // Tobias DEBUG
-	Log_Open("botlib.log");
+
+	if (botDeveloper) {
+		Log_Open("botlib.log");
+	}
 
 	botimport.Print(PRT_MESSAGE, "------- BotLib Initialization -------\n");
-#endif // Tobias END
-	botlibglobals.maxclients = (int)LibVarValue("maxclients", "128");
+
+	botlibglobals.maxclients = (int)LibVarValue("maxclients", "64");
 	botlibglobals.maxentities = (int)LibVarValue("maxentities", "1024");
 
 	errnum = AAS_Setup();			// be_aas_main.c
@@ -200,9 +187,9 @@ int Export_BotLibShutdown(void) {
 	PC_RemoveAllGlobalDefines();
 	// dump all allocated memory
 	//DumpMemory();
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	PrintMemoryLabels();
-#endif // Tobias END
+#endif
 	// shut down library log file
 	Log_Shutdown();
 
@@ -230,13 +217,11 @@ Export_BotLibVarGet
 =======================================================================================================================================
 */
 int Export_BotLibVarGet(const char *var_name, char *value, int size) {
-	char *varvalue;
+	const char *varvalue;
 
 	varvalue = LibVarGetString(var_name);
 
-	strncpy(value, varvalue, size - 1);
-
-	value[size - 1] = '\0';
+	Q_strncpyz(value, varvalue, size);
 	return BLERR_NOERROR;
 }
 
@@ -260,17 +245,16 @@ Export_BotLibLoadMap
 =======================================================================================================================================
 */
 int Export_BotLibLoadMap(const char *mapname) {
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime = botimport.MilliSeconds();
-#endif // Tobias END
+#endif
 	int errnum;
 
 	if (!BotLibSetup("BotLoadMap")) {
 		return BLERR_LIBRARYNOTSETUP;
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "------------ Map Loading ------------\n");
-#endif // Tobias END
 	// startup AAS for the current map, model and sound index
 	errnum = AAS_LoadMap(mapname);
 
@@ -280,10 +264,11 @@ int Export_BotLibLoadMap(const char *mapname) {
 	// initialize the items in the level
 	BotInitLevelItems();		// be_ai_goal.h
 	BotSetBrushModelTypes();	// be_ai_move.h
-#ifndef BASEGAME // Tobias DEBUG
+
 	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
+#ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", botimport.MilliSeconds() - starttime);
-#endif // Tobias END
+#endif
 	return BLERR_NOERROR;
 }
 
@@ -292,7 +277,7 @@ int Export_BotLibLoadMap(const char *mapname) {
 Export_BotLibUpdateEntity
 =======================================================================================================================================
 */
-int Export_BotLibUpdateEntity(int ent, bot_entitystate_t *state) {
+static int Export_BotLibUpdateEntity(int ent, bot_entitystate_t *state) {
 
 	if (!BotLibSetup("BotUpdateEntity")) {
 		return BLERR_LIBRARYNOTSETUP;
@@ -312,7 +297,7 @@ int AAS_PointLight(vec3_t origin, int *red, int *green, int *blue);
 int AAS_TraceAreas(vec3_t start, vec3_t end, int *areas, vec3_t *points, int maxareas);
 int AAS_Reachability_WeaponJump(int area1num, int area2num);
 int BotFuzzyPointReachabilityArea(vec3_t origin);
-float BotGapDistance(vec3_t origin, vec3_t hordir, int checkdist, int entnum);
+int BotGapDistance(vec3_t origin, vec3_t hordir, int checkdist, int entnum);
 void AAS_FloodAreas(vec3_t origin);
 
 /*
@@ -322,7 +307,7 @@ BotExportTest
 */
 int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 	//return AAS_PointLight(parm2, NULL, NULL, NULL);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	static int area = -1;
 	static int line[2];
 	int newarea, i, highlightarea, flood;
@@ -336,8 +321,8 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 	//aas_reachability_t reach;
 	//bot_goal_t goal;
 	//clock_t start_time, end_time;
-	vec3_t mins = {-16, -16, -24};
-	vec3_t maxs = {16, 16, 56};
+	//vec3_t mins = {-16, -16, -24};
+	//vec3_t maxs = {16, 16, 56};
 	//int areas[10], numareas;
 
 	//return 0;
@@ -586,8 +571,8 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 
 	AAS_ClearShownDebugLines();
 
-	if (trace.ent) {
-		ent = &aasworld.entities[trace.ent];
+	if (trace.entityNum) {
+		ent = &aasworld.entities[trace.entityNum];
 		AAS_ShowBoundingBox(ent->origin, ent->mins, ent->maxs);
 	}
 
@@ -631,8 +616,8 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 
 		AAS_DrawPlaneCross(bsptrace.endpos, bsptrace.plane.normal, bsptrace.plane.dist + bsptrace.exp_dist, bsptrace.plane.type, LINECOLOR_GREEN);
 
-		if (trace.ent) {
-			ent = &aasworld.entities[trace.ent];
+		if (trace.entityNum) {
+			ent = &aasworld.entities[trace.entityNum];
 			AAS_ShowBoundingBox(ent->origin, ent->mins, ent->maxs);
 		}
 	}
@@ -644,13 +629,13 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3) {
 	if (bsptrace.fraction < 1.0) {
 		AAS_DrawPlaneCross(bsptrace.endpos, bsptrace.plane.normal, bsptrace.plane.dist, bsptrace.plane.type, LINECOLOR_RED);
 
-		if (bsptrace.ent) {
+		if (bsptrace.entityNum) {
 			ent = &aasworld.entities[bsptrace.ent];
 			AAS_ShowBoundingBox(ent->origin, ent->mins, ent->maxs);
 		}
 	}
 #endif
-#endif // Tobias END
+#endif
 	return 0;
 }
 

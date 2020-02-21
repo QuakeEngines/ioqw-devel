@@ -384,8 +384,8 @@ int BotVisibleEnemies(bot_state_t *bs) {
 		if (EntityIsDead(&entinfo) || entinfo.number == bs->entitynum) {
 			continue;
 		}
-		// if the enemy is invisible and not shooting
-		if (EntityIsInvisible(&entinfo) && !EntityIsShooting(&entinfo)) {
+		// if the enemy is invisible
+		if (EntityIsInvisible(&entinfo)) {
 			continue;
 		}
 		// if on the same team
@@ -923,7 +923,7 @@ int BotChat_HitTalking(bot_state_t *bs) {
 		return qfalse;
 	}
 
-	rnd = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_HITTALKING, 0, 1);
+	rnd = 0;
 	// don't chat in teamplay
 	if (TeamPlayIsOn()) {
 		return qfalse;

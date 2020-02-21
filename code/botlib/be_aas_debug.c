@@ -21,12 +21,13 @@ If you have questions concerning this license or the applicable additional terms
 ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 =======================================================================================================================================
 */
-// Tobias DEBUG
+
 /**************************************************************************************************************************************
  AAS debug code.
 **************************************************************************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../qcommon/surfaceflags.h"
 #include "l_memory.h"
 #include "l_script.h"
 #include "l_precomp.h"
@@ -521,9 +522,8 @@ void AAS_DrawCross(vec3_t origin, float size, int color) {
 AAS_PrintTravelType
 =======================================================================================================================================
 */
-/*
 void AAS_PrintTravelType(int traveltype) {
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	char *str;
 
 	switch (traveltype & TRAVELTYPE_MASK) {
@@ -578,9 +578,9 @@ void AAS_PrintTravelType(int traveltype) {
 	}
 
 	botimport.Print(PRT_MESSAGE, "%s", str);
-#endif // Tobias END
+#endif
 }
-*/
+
 /*
 =======================================================================================================================================
 AAS_DrawArrow
@@ -707,13 +707,10 @@ void AAS_ShowReachableAreas(int areanum) {
 
 		index++;
 		lasttime = AAS_Time();
-// Tobias DEBUG
-/*
+
 		AAS_PrintTravelType(reach.traveltype & TRAVELTYPE_MASK);
 
 		botimport.Print(PRT_MESSAGE, "\n");
-*/
-// Tobias END
 	}
 
 	AAS_ShowReachability(&reach);
@@ -812,4 +809,3 @@ void AAS_FloodAreas(vec3_t origin) {
 	AAS_FloodAreas_r(areanum, cluster, done);
 	FreeMemory(done);
 }
-// Tobias END

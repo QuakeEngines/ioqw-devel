@@ -35,7 +35,7 @@ cvar_t *cl_debuggraph;
 cvar_t *cl_graphheight;
 cvar_t *cl_graphscale;
 cvar_t *cl_graphshift;
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 cvar_t *cl_drawping;
 cvar_t *cl_drawpingfontsize;
 cvar_t *cl_drawpingposx;
@@ -59,7 +59,7 @@ cvar_t *cl_drawpacketsposy;
 cvar_t *cl_drawpacketsfontsize;
 cvar_t *cl_drawpacketsfirstinterval;
 cvar_t *cl_drawpacketssecondinterval;
-#endif // Tobias END
+// Tobias END
 /*
 =======================================================================================================================================
 SCR_DrawNamedPic
@@ -489,7 +489,7 @@ void SCR_DrawDebugGraph(void) {
 		re.DrawStretchPic(x + w - 1 - a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader);
 	}
 }
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 #if !defined (DEDICATED)
 ioq3_urt_t clu; // most new console variables and functions are called via this
 cvar_t *com_quiet; // excluded from the struct since it makes rebuilding hell.
@@ -1222,7 +1222,7 @@ void SCR_ioq3_urt(void) {
 	}
 }
 #endif
-#endif // Tobias END
+// Tobias END
 /*
 =======================================================================================================================================
 SCR_Init
@@ -1235,7 +1235,7 @@ void SCR_Init(void) {
 	cl_graphheight = Cvar_Get("graphheight", "32", CVAR_CHEAT);
 	cl_graphscale = Cvar_Get("graphscale", "1", CVAR_CHEAT);
 	cl_graphshift = Cvar_Get("graphshift", "0", CVAR_CHEAT);
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 	cl_drawping = Cvar_Get ("cl_drawPing", "0", CVAR_ARCHIVE);
 	cl_drawpingfontsize = Cvar_Get ("cl_drawPingFontSize", "7", CVAR_ARCHIVE);
 	cl_drawpingposx = Cvar_Get ("cl_drawPingPosX", "0", CVAR_ARCHIVE);
@@ -1259,7 +1259,7 @@ void SCR_Init(void) {
 	cl_drawpacketsfontsize = Cvar_Get ("cl_drawpacketsfontsize", "7", CVAR_ARCHIVE);
 	cl_drawpacketsfirstinterval = Cvar_Get ("cl_drawpacketsfirstinterval", "2", CVAR_ARCHIVE);
 	cl_drawpacketssecondinterval = Cvar_Get ("cl_drawpacketssecondtinterval", "10", CVAR_ARCHIVE);
-#endif // Tobias END
+// Tobias END
 	scr_initialized = qtrue;
 }
 
@@ -1322,9 +1322,7 @@ void SCR_DrawScreenField(stereoFrame_t stereoFrame) {
 #ifdef USE_VOIP
 				SCR_DrawVoipMeter();
 #endif
-#ifndef BASEGAME // Tobias DEBUG
-				SCR_ioq3_urt();
-#endif // Tobias END
+				SCR_ioq3_urt(); // Tobias DEBUG
 				break;
 		}
 	}

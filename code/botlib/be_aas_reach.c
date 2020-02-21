@@ -27,6 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 **************************************************************************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../qcommon/surfaceflags.h" // for CONTENTS_WATER, CONTENTS_LAVA, CONTENTS_SLIME etc.
 #include "l_log.h"
 #include "l_memory.h"
 #include "l_script.h"
@@ -4388,7 +4389,7 @@ void AAS_Reachability_WalkOffLedge(int areanum) {
 						VectorNormalize(dir);
 						VectorAdd(v1, v2, mid);
 						VectorScale(mid, 0.5, mid);
-						VectorMA(mid, 8, dir, mid);
+						VectorMA(mid, 31, dir, mid);
 						VectorCopy(mid, testend);
 
 						testend[2] -= 1000;
@@ -4655,7 +4656,7 @@ int AAS_ContinueInitReachability(float time) {
 		AAS_Reachability_Elevator();
 		// create func_bobbing reachabilities
 		AAS_Reachability_FuncBobbing();
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 		botimport.Print(PRT_MESSAGE, "%6d reach swim\n", reach_swim);
 		botimport.Print(PRT_MESSAGE, "%6d reach equal floor\n", reach_equalfloor);
 		botimport.Print(PRT_MESSAGE, "%6d reach step\n", reach_step);
@@ -4670,7 +4671,7 @@ int AAS_ContinueInitReachability(float time) {
 		botimport.Print(PRT_MESSAGE, "%6d reach elevator\n", reach_elevator);
 		botimport.Print(PRT_MESSAGE, "%6d reach rocketjump\n", reach_rocketjump);
 		botimport.Print(PRT_MESSAGE, "%6d reach jumppad\n", reach_jumppad);
-#endif // Tobias END
+#endif
 		// store all the reachabilities
 		AAS_StoreReachability();
 		// free the reachability link heap

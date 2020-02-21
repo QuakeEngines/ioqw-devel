@@ -176,7 +176,7 @@ extern int maxclients;	// maximum number of clients
 extern vmCvar_t bot_rocketjump;
 extern vmCvar_t bot_fastchat;
 extern vmCvar_t bot_nochat;
-extern vmCvar_t bot_noshoot;
+extern vmCvar_t bot_noshoot; // Tobias DEBUG
 extern vmCvar_t bot_testrchat;
 extern vmCvar_t bot_challenge;
 

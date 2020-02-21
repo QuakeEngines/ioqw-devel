@@ -109,16 +109,12 @@ static void UI_LoadArenasFromFile(char *filename) {
 	len = trap_FS_FOpenFile(filename, &f, FS_READ);
 
 	if (!f) {
-#ifndef BASEGAME // Tobias DEBUG
 		trap_Print(va(S_COLOR_RED "file not found: %s\n", filename));
-#endif // Tobias END
 		return;
 	}
 
 	if (len >= MAX_ARENAS_TEXT) {
-#ifndef BASEGAME // Tobias DEBUG
 		trap_Print(va(S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_ARENAS_TEXT));
-#endif // Tobias END
 		trap_FS_FCloseFile(f);
 		return;
 	}
@@ -165,9 +161,9 @@ void UI_LoadArenas(void) {
 		strcat(filename, dirptr);
 		UI_LoadArenasFromFile(filename);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	trap_Print(va("%i arenas parsed\n", ui_numArenas));
-#endif // Tobias END
+
 	if (UI_OutOfMemory()) {
 		trap_Print(S_COLOR_YELLOW "WARNING: not enough memory in pool to load all arenas\n");
 	}
@@ -248,16 +244,12 @@ static void UI_LoadBotsFromFile(char *filename) {
 	len = trap_FS_FOpenFile(filename, &f, FS_READ);
 
 	if (!f) {
-#ifndef BASEGAME // Tobias DEBUG
 		trap_Print(va(S_COLOR_RED "file not found: %s\n", filename));
-#endif // Tobias END
 		return;
 	}
 
 	if (len >= MAX_BOTS_TEXT) {
-#ifndef BASEGAME // Tobias DEBUG
 		trap_Print(va(S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_BOTS_TEXT));
-#endif // Tobias END
 		trap_FS_FCloseFile(f);
 		return;
 	}
@@ -305,9 +297,8 @@ void UI_LoadBots(void) {
 		strcat(filename, dirptr);
 		UI_LoadBotsFromFile(filename);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	trap_Print(va("%i bots parsed\n", ui_numBots));
-#endif // Tobias END
 }
 
 /*
@@ -318,9 +309,7 @@ UI_GetBotInfoByNumber
 char *UI_GetBotInfoByNumber(int num) {
 
 	if (num < 0 || num >= ui_numBots) {
-#ifndef BASEGAME // Tobias DEBUG
 		trap_Print(va(S_COLOR_RED "Invalid bot number: %i\n", num));
-#endif // Tobias END
 		return NULL;
 	}
 

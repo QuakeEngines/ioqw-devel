@@ -473,7 +473,7 @@ Svcmd_ListIPs_f
 void Svcmd_ListIPs_f(void) {
 	trap_Cmd_ExecuteText(EXEC_NOW, "g_banIPs\n");
 }
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 /*
 =======================================================================================================================================
 Svcmd_Teleport_f
@@ -523,7 +523,7 @@ void Svcmd_Teleport_f(void) {
 
 	TeleportPlayer(ent, position, angles);
 }
-#endif // Tobias END
+// Tobias END
 struct svcmd {
 	char *cmd;
 	qboolean dedicated;
@@ -540,14 +540,13 @@ svcmds[] = {
 	{"gamememory", qfalse, Svcmd_GameMem_f},
 	{"listip", qfalse, Svcmd_ListIPs_f},
 	{"removeip", qfalse, Svcmd_RemoveIP_f},
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 	{"teleport", qfalse, Svcmd_Teleport_f},
 	{"botreport", qfalse, Svcmd_BotTeamplayReport_f},
-#endif // Tobias END
+// Tobias END
 };
 
 const size_t numSvCmds = ARRAY_LEN(svcmds);
-
 /*
 =======================================================================================================================================
 G_ConsoleCommand

@@ -65,15 +65,13 @@ vmCvar_t bot_nochat;
 vmCvar_t bot_testrchat;
 vmCvar_t bot_challenge;
 vmCvar_t bot_predictobstacles;
-// Tobias HACK: new bot test cvars for debugging
-// DEBUG
+// Tobias DEBUG: new bot test cvars for debugging
 vmCvar_t bot_noshoot;
 vmCvar_t bot_equalize;
 vmCvar_t bot_equalizer_aim;
 vmCvar_t bot_equalizer_react;
 vmCvar_t bot_equalizer_fembon;
 vmCvar_t bot_equalizer_teambon;
-// DEBUGEND
 // Tobias END
 vmCvar_t g_spSkill;
 
@@ -325,12 +323,25 @@ EntityIsInvisible
 */
 qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
 
-	// the flag is always visible
-	if (EntityCarriesFlag(entinfo)) {
-		return qfalse;
-	}
-
+	// if player is invisible
 	if (entinfo->powerups & (1 << PW_INVIS)) {
+		// a shooting player is always visible
+		if (EntityIsShooting(entinfo)) {
+			return qfalse;
+		}
+		// the flag is always visible
+		if (EntityCarriesFlag(entinfo)) {
+			return qfalse;
+		}
+		// cubes are always visible
+		if (EntityCarriesCubes(entinfo)) {
+			return qfalse;
+		}
+		// the kamikaze is always visible
+		if (EntityHasKamikaze(entinfo)) {
+			return qfalse;
+		}
+		// invisible
 		return qtrue;
 	}
 
@@ -404,9 +415,9 @@ BotSetTeamStatus
 void BotSetTeamStatus(bot_state_t *bs) {
 	int teamtask;
 	aas_entityinfo_t entinfo;
-#ifndef BASEGAME // Tobias DEBUG
-	teamtask = TEAMTASK_NONE;
-#endif // Tobias END
+
+	teamtask = TEAMTASK_NONE; // Tobias DEBUG
+
 	switch (bs->ltgtype) {
 		case LTG_GETFLAG:
 			teamtask = TEAMTASK_OFFENSE;
@@ -443,7 +454,7 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		case LTG_CAMPORDER:
 			teamtask = TEAMTASK_CAMP;
 			break;
-#ifndef BASEGAME // Tobias DEBUG
+// Tobias DEBUG
 		case LTG_PATROL:
 		case LTG_GETITEM:
 		case LTG_KILL:
@@ -452,7 +463,7 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		default:
 			teamtask = TEAMTASK_NONE; // roaming
 			break;
-#endif // Tobias END
+// Tobias END
 	}
 
 	BotSetUserInfo(bs, "teamtask", va("%d", teamtask));
@@ -814,7 +825,7 @@ void BotCTFSeekGoals(bot_state_t *bs) {
 	}
 
 	bs->owndecision_time = FloatTime() + 5;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -1064,7 +1075,7 @@ void Bot1FCTFSeekGoals(bot_state_t *bs) {
 	}
 
 	bs->owndecision_time = FloatTime() + 5;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -3147,6 +3158,10 @@ int BotFindEnemy(bot_state_t *bs, int curenemy) {
 		if (g_entities[i].flags & FL_NOTARGET) {
 			continue;
 		}
+		// if on the same team
+		if (BotSameTeam(bs, i)) {
+			continue;
+		}
 		// get the entity information
 		BotEntityInfo(i, &entinfo);
 		// if this player is active
@@ -3157,8 +3172,8 @@ int BotFindEnemy(bot_state_t *bs, int curenemy) {
 		if (EntityIsDead(&entinfo) || entinfo.number == bs->entitynum) {
 			continue;
 		}
-		// if the enemy is invisible and not shooting
-		if (EntityIsInvisible(&entinfo) && !EntityIsShooting(&entinfo)) {
+		// if the enemy is invisible
+		if (EntityIsInvisible(&entinfo)) {
 			continue;
 		}
 		// if not an easy fragger don't shoot at chatting players
@@ -3177,8 +3192,8 @@ int BotFindEnemy(bot_state_t *bs, int curenemy) {
 		VectorSubtract(entinfo.origin, bs->origin, dir);
 
 		squaredist = VectorLengthSquared(dir);
-		// if this entity is not carrying a flag
-		if (!EntityCarriesFlag(&entinfo)) {
+		// if this entity is not carrying a flag or cubes
+		if (!EntityCarriesFlag(&entinfo) && !EntityCarriesCubes(&entinfo)) {
 			// if this enemy is further away than the current one
 			if (curenemy >= 0 && squaredist > cursquaredist) {
 				continue;
@@ -3186,10 +3201,6 @@ int BotFindEnemy(bot_state_t *bs, int curenemy) {
 		}
 		// if the bot has no
 		if (squaredist > Square(900.0 + alertness * 4000.0)) {
-			continue;
-		}
-		// ignore enemies
-		if (BotSameTeam(bs, i)) {
 			continue;
 		}
 		// if the bot's health decreased or the enemy is shooting
@@ -3672,19 +3683,6 @@ void BotAimAtEnemy(bot_state_t *bs) {
 
 	aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL, 0, 1);
 	aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY, 0, 1);
-
-	if (aim_skill > 0.95) {
-		// don't aim too early
-		reactiontime = 0.5 * trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_REACTIONTIME, 0, 1);
-
-		if (bs->enemysight_time > FloatTime() - reactiontime) {
-			return;
-		}
-
-		if (bs->teleport_time > FloatTime() - reactiontime) {
-			return;
-		}
-	}
 	// get the weapon information
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
 	// get the weapon specific aim accuracy and or aim skill
@@ -3710,11 +3708,22 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_BFG10K, 0, 1);
 	}
 
+	if (aim_skill > 0.95) {
+		// don't aim too early
+		reactiontime = 0.5 * trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_REACTIONTIME, 0, 1);
+
+		if (bs->enemysight_time > FloatTime() - reactiontime) {
+			return;
+		}
+
+		if (bs->teleport_time > FloatTime() - reactiontime) {
+			return;
+		}
+	}
+
 	if (aim_accuracy <= 0) {
 		aim_accuracy = 0.0001f;
 	}
-	// get the enemy entity information
-	BotEntityInfo(bs->enemy, &entinfo);
 	// if the enemy is invisible then shoot crappy most of the time
 	if (EntityIsInvisible(&entinfo)) {
 		if (random() > 0.1) {
@@ -3810,9 +3819,9 @@ void BotAimAtEnemy(bot_state_t *bs) {
 			}
 		}
 		// if the projectile does large radial damage
-		if (aim_skill > 0.6 && wi.proj.damagetype & DAMAGETYPE_RADIAL) {
-			// if the enemy isn't standing significantly higher than the bot
-			if (entinfo.origin[2] < bs->origin[2] + 16) {
+		if (aim_skill > 0.6 && (wi.proj.damagetype & DAMAGETYPE_RADIAL) && wi.proj.radius > 50) {
+			// if the enemy isn't standing significantly higher than the bot and isn't in water
+			if (entinfo.origin[2] < bs->origin[2] + 16 && !(trap_AAS_PointContents(entinfo.origin) & (CONTENTS_WATER|CONTENTS_SLIME|CONTENTS_LAVA))) {
 				// try to aim at the ground in front of the enemy
 				VectorCopy(entinfo.origin, end);
 
@@ -4298,8 +4307,7 @@ int BotFuncButtonActivateGoal(bot_state_t *bs, int bspent, bot_activategoal_t *a
 	VectorAdd(mins, maxs, origin);
 	VectorScale(origin, 0.5, origin);
 	// touch distance of the button
-	dist = fabs(movedir[0]) * size[0] + fabs(movedir[1]) * size[1] + fabs(movedir[2]) * size[2];
-	dist *= 0.5;
+	dist = fabs(movedir[0]) * size[0] + fabs(movedir[1]) * size[1] + fabs(movedir[2]) * size[2] - lip;
 
 	trap_AAS_FloatForBSPEpairKey(bspent, "health", &health);
 	// if the button is shootable
@@ -5071,7 +5079,7 @@ int BotAIPredictObstacles(bot_state_t *bs, bot_goal_t *goal) {
 		return qfalse;
 	}
 	// always predict when the goal change or at regular intervals
-	if (bs->predictobstacles_goalareanum == goal->areanum && bs->predictobstacles_time > FloatTime() - 6) {
+	if (bs->predictobstacles_goalareanum == goal->areanum && bs->predictobstacles_time > FloatTime() - 0.5) {
 		return qfalse;
 	}
 
@@ -5159,7 +5167,7 @@ void BotCheckConsoleMessages(bot_state_t *bs) {
 		// if there's no match
 		if (!BotMatchMessage(bs, m.message)) {
 			// if it is a chat message
-			if (m.type == CMS_CHAT/* && !bot_nochat.integer*/) { // Tobias DEBUG
+			if (m.type == CMS_CHAT && !bot_nochat.integer) {
 				if (!trap_BotFindMatch(m.message, &match, MTCONTEXT_REPLYCHAT)) {
 					trap_BotRemoveConsoleMessage(bs->cs, handle);
 					continue;
@@ -5926,19 +5934,17 @@ void BotSetupDeathmatchAI(void) {
 
 	trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "1", 0);
 	trap_Cvar_Register(&bot_fastchat, "bot_fastchat", "0", 0);
-	trap_Cvar_Register(&bot_nochat, "bot_nochat", "1", 0);
+	trap_Cvar_Register(&bot_nochat, "bot_nochat", "0", 0);
 	trap_Cvar_Register(&bot_testrchat, "bot_testrchat", "0", 0);
 	trap_Cvar_Register(&bot_challenge, "bot_challenge", "0", 0);
 	trap_Cvar_Register(&bot_predictobstacles, "bot_predictobstacles", "1", 0);
-// Tobias HACK
-// DEBUG
+// Tobias DEBUG
 	trap_Cvar_Register(&bot_noshoot, "bot_noshoot", "0", 0);
 	trap_Cvar_Register(&bot_equalize, "bot_equalize", "1", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_aim, "bot_equalizer_aim", "0.8", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_react, "bot_equalizer_react", "0.5", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_fembon, "bot_equalizer_fembon", "4", CVAR_USERINFO|CVAR_ARCHIVE);
 	trap_Cvar_Register(&bot_equalizer_teambon, "bot_equalizer_teambon", "5", CVAR_USERINFO|CVAR_ARCHIVE); //10
-// DEBUGEND
 // Tobias END
 	trap_Cvar_Register(&g_spSkill, "g_spSkill", "2", 0);
 

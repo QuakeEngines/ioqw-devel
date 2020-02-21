@@ -51,12 +51,11 @@ struct weaponinfo_s;
 #define LINECOLOR_CYAN		6
 #define LINECOLOR_WHITE		7
 // Print types
-#define PRT_DEVELOPER	0
-#define PRT_MESSAGE		1
-#define PRT_WARNING		2
-#define PRT_ERROR		3
-#define PRT_FATAL		4
-#define PRT_EXIT		5
+#define PRT_MESSAGE	1
+#define PRT_WARNING	2
+#define PRT_ERROR	3
+#define PRT_FATAL	4
+#define PRT_EXIT	5
 // console message types
 #define CMS_NORMAL	0
 #define CMS_CHAT	1
@@ -133,7 +132,7 @@ typedef struct botlib_import_s {
 	// get time for measuring time lapse
 	int (*MilliSeconds)(void);
 	// print messages from the bot library
-	void (QDECL *Print)(int type, char *fmt, ...) __attribute__((format(printf, 2, 3)));
+	void (QDECL *Print)(int type, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 	// trace a bbox through the world
 	void (*Trace)(bsp_trace_t *trace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask);
 	// trace a bbox against entities
@@ -148,7 +147,7 @@ typedef struct botlib_import_s {
 	char *(*BSPEntityData)(void);
 	void (*BSPModelMinsMaxsOrigin)(int modelnum, vec3_t angles, vec3_t mins, vec3_t maxs, vec3_t origin);
 	// send a bot client command
-	void (*BotClientCommand)(int client, char *command);
+	void (*BotClientCommand)(int client, const char *command);
 	// memory allocation
 	void *(*GetMemory)(int size);	// allocate from Zone
 	void (*FreeMemory)(void *ptr);	// free memory from Zone
@@ -211,9 +210,9 @@ typedef struct ea_export_s {
 	void (*EA_View)(int client, vec3_t viewangles);
 	void (*EA_Crouch)(int client);
 	void (*EA_SelectWeapon)(int client, int weapon);
-	void (*EA_Say)(int client, char *str);
-	void (*EA_SayTeam)(int client, char *str);
-	void (*EA_Command)(int client, char *command);
+	void (*EA_Say)(int client, const char *str);
+	void (*EA_SayTeam)(int client, const char *str);
+	void (*EA_Command)(int client, const char *command);
 	void (*EA_Gesture)(int client);
 	void (*EA_Action)(int client, int action);
 	void (*EA_Talk)(int client);
@@ -333,7 +332,7 @@ typedef struct botlib_export_s {
 	// gets a library variable returns BLERR_
 	int (*BotLibVarGet)(const char *var_name, char *value, int size);
 	// sets a C-like define returns BLERR_
-	int (*PC_AddGlobalDefine)(char *string);
+	int (*PC_AddGlobalDefine)(const char *string);
 	int (*PC_LoadSourceHandle)(const char *filename);
 	int (*PC_FreeSourceHandle)(int handle);
 	int (*PC_ReadTokenHandle)(int handle, pc_token_t *pc_token);
@@ -370,16 +369,16 @@ name:						default:	module(s):		description:
 "phys_gravity"				"800"		be_aas_move.c	gravity value
 "phys_waterfriction"		"1"			be_aas_move.c	water friction
 "phys_watergravity"			"400"		be_aas_move.c	gravity in water
-"phys_maxvelocity"			"280"		be_aas_move.c	maximum velocity
+"phys_maxvelocity"			"260"		be_aas_move.c	maximum velocity
 "phys_maxwalkvelocity"		"280"		be_aas_move.c	maximum walk velocity
 "phys_maxcrouchvelocity"	"100"		be_aas_move.c	maximum crouch velocity
-"phys_maxswimvelocity"		"150"		be_aas_move.c	maximum swim velocity
+"phys_maxswimvelocity"		"45"		be_aas_move.c	maximum swim velocity
 "phys_walkaccelerate"		"10"		be_aas_move.c	walk acceleration
 "phys_airaccelerate"		"1"			be_aas_move.c	air acceleration
 "phys_swimaccelerate"		"4"			be_aas_move.c	swim acceleration
 "phys_maxstep"				"19"		be_aas_move.c	maximum step height
 "phys_maxsteepness"			"0.7"		be_aas_move.c	maximum floor steepness
-"phys_maxwaterjump"			"12"		be_aas_move.c	maximum waterjump height
+"phys_maxwaterjump"			"20"		be_aas_move.c	maximum waterjump height
 "phys_maxbarrier"			"43"		be_aas_move.c	maximum barrier height
 "phys_jumpvel"				"200"		be_aas_move.c	jump z velocity
 "phys_falldelta5"			"40"		be_aas_move.c

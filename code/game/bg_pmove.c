@@ -35,7 +35,7 @@ pml_t pml;
 // movement parameters
 float pm_stopspeed = 100.0f;
 float pm_duckScale = 0.25f;
-float pm_swimScale = 0.50f;
+float pm_swimScale = 0.15f;
 float pm_accelerate = 10.0f;
 float pm_airaccelerate = 1.0f;
 float pm_wateraccelerate = 4.0f;
@@ -332,6 +332,10 @@ static float PM_CmdScale(usercmd_t *cmd) {
 
 	total = sqrt(cmd->forwardmove * cmd->forwardmove + cmd->rightmove * cmd->rightmove + cmd->upmove * cmd->upmove);
 	scale = (float)pm->ps->speed * max / (127.0 * total);
+	// ignore if in air
+	if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
+		return scale;
+	}
 	// ignore if spectator
 	if (pm->ps->persistant[PERS_TEAM] == TEAM_SPECTATOR) {
 		return scale;
@@ -429,6 +433,10 @@ static qboolean PM_CheckJump(void) {
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
 	pm->ps->velocity[2] = JUMP_VELOCITY;
 
+	if (bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT) {
+		pm->ps->velocity[2] *= 1.5;
+	}
+
 	PM_AddEvent(EV_JUMP);
 
 	if (pm->cmd.forwardmove >= 0) {
@@ -467,14 +475,14 @@ static qboolean PM_CheckWaterJump(void) {
 	VectorNormalize(flatforward);
 	VectorMA(pm->ps->origin, 30, flatforward, spot);
 
-	spot[2] += 4;
+	spot[2] += 6; // Tobias CHECK: compensate for the new viewheight to get out of water with ease again (but why do other games not need this?), AND I think this fixes the issue with bots hanging around in water (in q3dm12 BFG room).
 	cont = pm->pointcontents(spot, pm->ps->clientNum);
 
 	if (!(cont & CONTENTS_SOLID)) {
 		return qfalse;
 	}
 
-	spot[2] += 18; // Tobias NOTE: this depends on viewheight
+	spot[2] += 24; // Tobias CHECK: compensate for the new viewheight to get out of water with ease again (but why do other games not need this?), AND I think this fixes the issue with bots hanging around in water (in q3dm12 BFG room).
 	cont = pm->pointcontents(spot, pm->ps->clientNum);
 
 	if (cont & (CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY)) {
@@ -528,15 +536,16 @@ static void PM_WaterMove(void) {
 		PM_WaterJumpMove();
 		return;
 	}
-	// jump = head for surface
-	if (pm->cmd.upmove >= 10) {
-		if (pm->ps->velocity[2] > -300) {
-			if (pm->watertype & CONTENTS_WATER) {
-				pm->ps->velocity[2] = 100;
-			} else if (pm->watertype & CONTENTS_SLIME) {
-				pm->ps->velocity[2] = 80;
-			} else {
-				pm->ps->velocity[2] = 40;
+
+	if (pm->waterlevel == 3) {
+		// jump = head for surface
+		if (pm->cmd.upmove >= 10) {
+			if (pm->ps->velocity[2] > -300) {
+				if (pm->watertype & CONTENTS_LAVA) {
+					pm->ps->velocity[2] = 10;
+				} else {
+					pm->ps->velocity[2] = 50;
+				}
 			}
 		}
 	}
@@ -548,7 +557,12 @@ static void PM_WaterMove(void) {
 	if (!scale) {
 		wishvel[0] = 0;
 		wishvel[1] = 0;
-		wishvel[2] = -60; // sink towards bottom
+		// sink towards bottom
+		if (pm->watertype & CONTENTS_LAVA) {
+			wishvel[2] = -10;
+		} else {
+			wishvel[2] = -60;
+		}
 	} else {
 		for (i = 0; i < 3; i++) {
 			wishvel[i] = scale * pml.forward[i] * pm->cmd.forwardmove + scale * pml.right[i] * pm->cmd.rightmove;
@@ -565,7 +579,9 @@ static void PM_WaterMove(void) {
 		wishspeed = pm->ps->speed * pm_swimScale;
 	}
 
-	PM_Accelerate(wishdir, wishspeed, pm_wateraccelerate);
+	if (pm->watertype & CONTENTS_LAVA) {
+		wishspeed *= 0.5;
+	}
 	// make sure we can go up slopes easily under water
 	if (pml.groundPlane && DotProduct(pm->ps->velocity, pml.groundTrace.plane.normal) < 0) {
 		vel = VectorLength(pm->ps->velocity);
@@ -579,6 +595,7 @@ static void PM_WaterMove(void) {
 	}
 
 	PM_SlideMove(qfalse);
+	PM_Accelerate(wishdir, wishspeed, pm_wateraccelerate);
 }
 
 /*
@@ -657,8 +674,6 @@ static void PM_AirMove(void) {
 
 	wishspeed = VectorNormalize(wishdir);
 	wishspeed *= scale;
-	// not on ground, so little effect on velocity
-	PM_Accelerate(wishdir, wishspeed, pm_airaccelerate);
 	// we may have a ground plane that is very steep, even though we don't have a groundentity
 	// slide along the steep plane
 	if (pml.groundPlane) {
@@ -666,6 +681,8 @@ static void PM_AirMove(void) {
 	}
 
 	PM_StepSlideMove(qtrue);
+	// not on ground, so little effect on velocity
+	PM_Accelerate(wishdir, wishspeed, pm_airaccelerate);
 }
 
 /*
@@ -1128,6 +1145,7 @@ static void PM_CrashLand(void) {
 	float a, b, c, den;
 	int stunTime;
 
+	stunTime = 0;
 	// decide which landing animation to use
 	if (pm->ps->pm_flags & PMF_BACKWARDS_JUMP) {
 		PM_ForceLegsAnim(LEGS_LANDB);
@@ -1152,7 +1170,6 @@ static void PM_CrashLand(void) {
 	t = (-b - sqrt(den)) / (2 * a);
 	delta = vel + t * acc;
 	delta = delta * delta * 0.0001;
-	stunTime = 0;
 	// ducking while falling doubles damage
 	if (pm->ps->pm_flags & PMF_DUCKED) {
 		delta *= 2;
@@ -1165,10 +1182,15 @@ static void PM_CrashLand(void) {
 	if (pm->waterlevel == 2) {
 		delta *= 0.85;
 	}
+	// the scout powerup also reduces falling damage
+	if(bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT) {
+		delta *= 0.9;
+	}
 
 	if (delta < 1) {
 		return;
 	}
+	// create a local entity event to play the sound
 	// SURF_NODAMAGE is used for bounce pads where you don't want to take full damage or play a crunch sound
 	if (!(pml.groundTrace.surfaceFlags & SURF_NODAMAGE)) {
 		// create a local entity event to play the sound
@@ -1185,7 +1207,7 @@ static void PM_CrashLand(void) {
 			}
 
 			stunTime = 250;
-		} else if (delta > 48 ) {
+		} else if (delta > 48) {
 			// this is a pain grunt, so don't play it if dead
 			if (pm->ps->stats[STAT_HEALTH] > 0) {
 				PM_AddEvent(EV_FALL_DMG_15);
@@ -1565,10 +1587,10 @@ static void PM_Footsteps(void) {
 	}
 
 	footstep = qfalse;
-
+	// ducked
 	if (pm->ps->pm_flags & PMF_DUCKED) {
-		bobmove = 0.5; // ducked characters bob much faster
-
+		bobmove = 0.5; // 0.65f
+		// (auto-)walking
 		if (pm->ps->pm_flags & PMF_BACKWARDS_RUN) {
 			PM_ContinueLegsAnim(LEGS_BACKCR);
 		} else {
@@ -1872,6 +1894,10 @@ static void PM_Weapon(void) {
 		case WP_BFG:
 			addTime = 200;
 			break;
+	}
+
+	if (bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN) {
+		addTime /= 1.1;
 	}
 
 	pm->ps->weaponTime += addTime;

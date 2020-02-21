@@ -160,4 +160,3 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define CHARACTERISTIC_CHAT_RANDOM					60 // float [0, 1]
 // tendency to reply to chats
 #define CHARACTERISTIC_CHAT_REPLY					61 // float [0, 1]
-#define CHARACTERISTIC_CHAT_HITTALKING				62 // float [0, 1]

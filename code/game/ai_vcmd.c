@@ -89,7 +89,7 @@ void BotVoiceChat_GetFlag(bot_state_t *bs, int client, int mode) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -137,7 +137,7 @@ void BotVoiceChat_Offense(bot_state_t *bs, int client, int mode) {
 		// remember last ordered task
 		BotRememberLastOrderedTask(bs);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -190,7 +190,7 @@ void BotVoiceChat_Defend(bot_state_t *bs, int client, int mode) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -220,7 +220,7 @@ void BotVoiceChat_Patrol(bot_state_t *bs, int client, int mode) {
 	trap_BotEnterChat(bs->cs, client, CHAT_TELL);
 	BotVoiceChatOnly(bs, -1, VOICECHAT_ONPATROL);
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -278,7 +278,7 @@ void BotVoiceChat_Camp(bot_state_t *bs, int client, int mode) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -334,7 +334,7 @@ void BotVoiceChat_FollowMe(bot_state_t *bs, int client, int mode) {
 	BotSetTeamStatus(bs);
 	// remember last ordered task
 	BotRememberLastOrderedTask(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -352,7 +352,7 @@ void BotVoiceChat_FollowFlagCarrier(bot_state_t *bs, int client, int mode) {
 	if (carrier >= 0) {
 		BotVoiceChat_FollowMe(bs, carrier, mode);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }
@@ -381,7 +381,7 @@ void BotVoiceChat_ReturnFlag(bot_state_t *bs, int client, int mode) {
 	bs->rushbaseaway_time = 0;
 
 	BotSetTeamStatus(bs);
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	BotPrintTeamGoal(bs);
 #endif // DEBUG
 }

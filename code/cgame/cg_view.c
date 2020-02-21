@@ -391,7 +391,7 @@ static void CG_OffsetFirstPersonView(void) {
 	angles[PITCH] += delta * cg_runpitch.value;
 	delta = DotProduct(predictedVelocity, cg.refdef.viewaxis[1]);
 	angles[ROLL] -= delta * cg_runroll.value;
-	delta = DotProduct(predictedVelocity, cg.refdef.viewaxis[0]);
+	delta = DotProduct(predictedVelocity, cg.refdef.viewaxis[0]); // Tobias NOTE: same as above, re-use it for [2] bob?
 	angles[YAW] -= delta * cg_runyaw.value;
 	// add angles based on bob, make sure the bob is visible even at low speeds
 	speed = cg.xyspeed > 200 ? cg.xyspeed : 200;
@@ -419,7 +419,7 @@ static void CG_OffsetFirstPersonView(void) {
 	delta = cg.bobfracsin * cg_bobyaw.value * speed;
 
 	if (cg.predictedPlayerState.pm_flags & PMF_DUCKED) {
-		delta *= 2; // crouching accentuates roll
+		delta *= 2; // crouching accentuates yaw
 	}
 
 	if (cg.bobcycle & 1) {
@@ -827,7 +827,7 @@ void CG_AddBufferedAnnouncerSound(sfxHandle_t sfx) {
 
 /*
 =======================================================================================================================================
-CG_HasBufferedSound
+CG_HasBufferedAnnouncerSound
 =======================================================================================================================================
 */
 qboolean CG_HasBufferedAnnouncerSound(void) {
@@ -893,8 +893,7 @@ CG_SetupFrustum
 */
 void CG_SetupFrustum(void) {
 	int i;
-	float xs, xc;
-	float ang;
+	float xs, xc, ang;
 
 	ang = cg.refdef.fov_x / 180 * M_PI * 0.5f;
 	xs = sin(ang);
@@ -947,6 +946,8 @@ qboolean CG_CullPoint(vec3_t pt) {
 /*
 =======================================================================================================================================
 CG_CullPointAndRadius
+
+Returns true if culled.
 =======================================================================================================================================
 */
 qboolean CG_CullPointAndRadius(const vec3_t pt, vec_t radius) {
@@ -997,12 +998,12 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoP
 		CG_DrawInformation();
 		return;
 	}
+	// let the client system know what our weapon and zoom settings are
+	trap_SetUserCmdValue(cg.weaponSelect, cg.zoomSensitivity);
 
 	if (!cg.lightstylesInited) {
 		CG_SetupDlightstyles();
 	}
-	// let the client system know what our weapon and zoom settings are
-	trap_SetUserCmdValue(cg.weaponSelect, cg.zoomSensitivity);
 	// this counter will be bumped for every valid scene we generate
 	cg.clientFrame++;
 	// update cg.predictedPlayerState

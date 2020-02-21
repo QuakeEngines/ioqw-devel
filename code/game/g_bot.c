@@ -26,10 +26,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 static int g_numBots;
 static char *g_botInfos[MAX_BOTS];
-
 static int g_numTeamBots;
 static char *g_teamBotInfos[MAX_BOTS];
-
 int g_numArenas;
 static char *g_arenaInfos[MAX_ARENAS];
 
@@ -181,9 +179,9 @@ static void G_LoadArenas(void) {
 		strcat(filename, dirptr);
 		G_LoadArenasFromFile(filename);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	trap_Print(va("%i arenas parsed\n", g_numArenas));
-#endif // Tobias END
+
 	for (n = 0; n < g_numArenas; n++) {
 		Info_SetValueForKey(g_arenaInfos[n], "num", va("%i", n));
 	}
@@ -1034,9 +1032,8 @@ static void G_LoadBots(void) {
 		strcat(filename, dirptr);
 		G_LoadBotsFromFile(filename);
 	}
-#ifndef BASEGAME // Tobias DEBUG
+
 	trap_Print(va("%i bots parsed\n", g_numBots));
-#endif // Tobias END
 }
 
 /*

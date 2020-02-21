@@ -1048,10 +1048,10 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 
 	if (!handle) {
 		Com_Printf(S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile);
-		handle = trap_PC_LoadSource("ui/menus.txt");
+		handle = trap_PC_LoadSource("ui/ui1/menus.txt");
 
 		if (!handle) {
-			trap_Error(S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!");
+			trap_Error(S_COLOR_RED "default menu file not found: ui/ui1/menus.txt, unable to continue!");
 		}
 	}
 
@@ -1105,7 +1105,7 @@ void UI_Load(void) {
 	}
 
 	if (menuSet == NULL || menuSet[0] == '\0') {
-		menuSet = "ui/menus.txt";
+		menuSet = "ui/ui1/menus.txt";
 	}
 
 	String_Init();
@@ -1379,8 +1379,14 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboole
 	// 1 - Human
 	// 2 - Random Bot
 	// 3.. NumCharacters - Bot
-	int value = trap_Cvar_VariableValue(va(blue ? "ui_blueteam%i" : "ui_redteam%i", num));
+	int value;
 	const char *text;
+
+	if (ui_actualNetGameType.integer > GT_TEAM) {
+		value = trap_Cvar_VariableValue(va(blue ? "ui_blueteamctf%i" : "ui_redteamctf%i", num));
+	} else {
+		value = trap_Cvar_VariableValue(va(blue ? "ui_blueteamtdm%i" : "ui_redteamtdm%i", num));
+	}
 
 	if (value <= 0) {
 		text = "Closed";
@@ -1793,7 +1799,7 @@ static const char *UI_AIFromName(const char *name) {
 			return uiInfo.characterList[j].name;
 		}
 	}
-	// name is listed in team list but not in alias or characters list.
+	// name is listed in team list but not in alias or characters list
 	Com_Printf(S_COLOR_YELLOW "WARNING: Unknown team character '%s'.\n", name);
 	return name;
 }
@@ -2073,7 +2079,11 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 		case UI_BLUETEAM5:
 		case UI_BLUETEAM6:
 		case UI_BLUETEAM7:
-			value = trap_Cvar_VariableValue(va("ui_blueteam%i", ownerDraw - UI_BLUETEAM1 + 1));
+			if (ui_actualNetGameType.integer > GT_TEAM) {
+				value = trap_Cvar_VariableValue(va("ui_blueteamctf%i", ownerDraw - UI_BLUETEAM1 + 1));
+			} else {
+				value = trap_Cvar_VariableValue(va("ui_blueteamtdm%i", ownerDraw - UI_BLUETEAM1 + 1));
+			}
 
 			if (value <= 0) {
 				text = "Closed";
@@ -2098,7 +2108,11 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 		case UI_REDTEAM5:
 		case UI_REDTEAM6:
 		case UI_REDTEAM7:
-			value = trap_Cvar_VariableValue(va("ui_redteam%i", ownerDraw - UI_REDTEAM1 + 1));
+			if (ui_actualNetGameType.integer > GT_TEAM) {
+				value = trap_Cvar_VariableValue(va("ui_redteamctf%i", ownerDraw - UI_REDTEAM1 + 1));
+			} else {
+				value = trap_Cvar_VariableValue(va("ui_redteamtdm%i", ownerDraw - UI_REDTEAM1 + 1));
+			}
 
 			if (value <= 0) {
 				text = "Closed";
@@ -3020,9 +3034,16 @@ static qboolean UI_TeamMember_HandleKey(int flags, float *special, int key, qboo
 		// 1 - Human
 		// 2 - Random Bot
 		// 3.. NumCharacters - Bot
-		char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);
-		int value = trap_Cvar_VariableValue(cvar);
+		char *cvar;
+		int value;
 
+		if (ui_actualNetGameType.integer > GT_TEAM) {
+			cvar = va(blue ? "ui_blueteamctf%i" : "ui_redteamctf%i", num);
+		} else {
+			cvar = va(blue ? "ui_blueteamtdm%i" : "ui_redteamtdm%i", num);
+		}
+
+		value = trap_Cvar_VariableValue(cvar);
 		value += select;
 
 		if (value >= uiInfo.characterCount + 3) {
@@ -3900,13 +3921,23 @@ static void UI_RunMenuScript(char **args) {
 
 			if (ui_actualNetGameType.integer > GT_TOURNAMENT) {
 				for (i = 0; i < PLAYERS_PER_TEAM; i++) {
-					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+					int bot;
+
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_redteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_redteamtdm%i", i + 1));
+					}
 
 					if (bot >= 0) {
 						clients++;
 					}
 
-					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamtdm%i", i + 1));
+					}
 
 					if (bot >= 0) {
 						clients++;
@@ -3938,7 +3969,13 @@ static void UI_RunMenuScript(char **args) {
 					// 1 - Human
 					// 2 - Random Bot
 					// 3.. NumCharacters - Bot
-					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+					int bot;
+
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_redteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_redteamtdm%i", i + 1));
+					}
 
 					if (bot > 1) {
 						if (bot == 2) {
@@ -3951,7 +3988,11 @@ static void UI_RunMenuScript(char **args) {
 						trap_Cmd_ExecuteText(EXEC_APPEND, buff);
 					}
 
-					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamtdm%i", i + 1));
+					}
 
 					if (bot > 1) {
 						if (bot == 2) {
@@ -3966,6 +4007,10 @@ static void UI_RunMenuScript(char **args) {
 				}
 			} else {
 				for (i = 0; i < PLAYERS_NOT_TEAM; i++) {
+					// 0 - None
+					// 1 - Human
+					// 2 - Random Bot
+					// 3.. NumCharacters - Bot
 					int bot = trap_Cvar_VariableValue(va("ui_notteam%i", i + 1));
 
 					if (bot > 1) {
@@ -3980,6 +4025,7 @@ static void UI_RunMenuScript(char **args) {
 					}
 				}
 			}
+			// Tobias FIXME: this script will start a new server, add bots but doesn't check if there are already enough bots, so we must kick already connected bots, otherwise bots are added to the existing ones continuously with each new map (FIXME?).
 		} else if (Q_stricmp(name, "StartServerIngame") == 0) {
 // Tobias FIXME: 1: Changing the gametype from a team game to ffa and than back to a team game will switch teams for some connected players, and also displays the wrong HUD (Free for all HUD in team gametypes and vice versa, etc.)!
 //				 2: Waiting for too long before starting a new server will CRASH! Is this still the case?
@@ -4004,13 +4050,23 @@ static void UI_RunMenuScript(char **args) {
 
 			if (ui_actualNetGameType.integer > GT_TOURNAMENT) {
 				for (i = 0; i < PLAYERS_PER_TEAM; i++) {
-					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+					int bot;
+
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_redteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_redteamtdm%i", i + 1));
+					}
 
 					if (bot >= 0) {
 						clients++;
 					}
 
-					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamtdm%i", i + 1));
+					}
 
 					if (bot >= 0) {
 						clients++;
@@ -4040,12 +4096,18 @@ static void UI_RunMenuScript(char **args) {
 			delay = 500;
 
 			if (ui_actualNetGameType.integer > GT_TOURNAMENT) {
-				// 0 - None
-				// 1 - Human
-				// 2 - Random Bot
-				// 3.. NumCharacters - Bot
 				for (i = 0; i < PLAYERS_PER_TEAM; i++) {
-					int bot = trap_Cvar_VariableValue(va("ui_redteam%i", i + 1));
+					// 0 - None
+					// 1 - Human
+					// 2 - Random Bot
+					// 3.. NumCharacters - Bot
+					int bot;
+
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_redteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_redteamtdm%i", i + 1));
+					}
 
 					if (bot > 1) {
 						if (bot == 2) {
@@ -4060,7 +4122,11 @@ static void UI_RunMenuScript(char **args) {
 						delay += 500;
 					}
 
-					bot = trap_Cvar_VariableValue(va("ui_blueteam%i", i + 1));
+					if (ui_actualNetGameType.integer > GT_TEAM) {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamctf%i", i + 1));
+					} else {
+						bot = trap_Cvar_VariableValue(va("ui_blueteamtdm%i", i + 1));
+					}
 
 					if (bot > 1) {
 						if (bot == 2) {
@@ -4077,6 +4143,10 @@ static void UI_RunMenuScript(char **args) {
 				}
 			} else {
 				for (i = 0; i < PLAYERS_NOT_TEAM; i++) {
+					// 0 - None
+					// 1 - Human
+					// 2 - Random Bot
+					// 3.. NumCharacters - Bot
 					int bot = trap_Cvar_VariableValue(va("ui_notteam%i", i + 1));
 
 					if (bot > 1) {
@@ -4214,6 +4284,18 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cmd_ExecuteText(EXEC_APPEND, "disconnect\n");
 			trap_Key_SetCatcher(KEYCATCH_UI);
 			Menus_CloseAll();
+
+			if (ui_singlePlayerActive.integer) {
+				// put back all the ui overrides
+				trap_Cvar_SetValue("capturelimit", trap_Cvar_VariableValue("ui_saveCaptureLimit"));
+				trap_Cvar_SetValue("fraglimit", trap_Cvar_VariableValue("ui_saveFragLimit"));
+				trap_Cvar_SetValue("cg_drawTimer", trap_Cvar_VariableValue("ui_drawTimer"));
+				trap_Cvar_SetValue("g_doWarmup", trap_Cvar_VariableValue("ui_doWarmup"));
+				trap_Cvar_SetValue("g_Warmup", trap_Cvar_VariableValue("ui_Warmup"));
+				trap_Cvar_SetValue("sv_pure", trap_Cvar_VariableValue("ui_pure"));
+				trap_Cvar_SetValue("g_friendlyFire", trap_Cvar_VariableValue("ui_friendlyFire"));
+			}
+
 			Menus_ActivateByName("main");
 		} else if (Q_stricmp(name, "ServerSort") == 0) {
 			int sortColumn;
@@ -6240,17 +6322,17 @@ void _UI_Init(qboolean inGameLoad) {
 	menuSet = UI_Cvar_VariableString("ui_menuFiles");
 
 	if (menuSet == NULL || menuSet[0] == '\0') {
-		menuSet = "ui/menus.txt";
+		menuSet = "ui/ui1/menus.txt";
 	}
 #if 0
 	if (uiInfo.inGameLoad) {
-		UI_LoadMenus("ui/ingame.txt", qtrue);
+		UI_LoadMenus("ui/ui1/menus_ingame.txt", qtrue);
 	} else {
 
 	}
 #else
 	UI_LoadMenus(menuSet, qtrue);
-	UI_LoadMenus("ui/ingame.txt", qfalse);
+	UI_LoadMenus("ui/ui1/menus_ingame.txt", qfalse);
 #endif
 	Menus_CloseAll();
 	trap_LAN_LoadCachedServers();
@@ -6271,8 +6353,8 @@ void _UI_Init(qboolean inGameLoad) {
 	uiInfo.previewMovie = -1;
 
 	if (trap_Cvar_VariableValue("ui_TeamArenaFirstRun") == 0) {
-		trap_Cvar_SetValue("s_volume", 1.0);
-		trap_Cvar_SetValue("s_musicvolume", 0.0);
+		trap_Cvar_SetValue("s_volume", 1);
+		trap_Cvar_SetValue("s_musicvolume", 0);
 		trap_Cvar_SetValue("ui_TeamArenaFirstRun", 1);
 	}
 
@@ -6351,7 +6433,7 @@ void UI_LoadNonIngame(void) {
 	const char *menuSet = UI_Cvar_VariableString("ui_menuFiles");
 
 	if (menuSet == NULL || menuSet[0] == '\0') {
-		menuSet = "ui/menus.txt";
+		menuSet = "ui/ui1/menus.txt";
 	}
 
 	UI_LoadMenus(menuSet, qfalse);
@@ -6741,21 +6823,35 @@ vmCvar_t ui_drawCrosshair;
 vmCvar_t ui_drawCrosshairNames;
 vmCvar_t ui_marks;
 vmCvar_t ui_redteam;
-vmCvar_t ui_redteam1;
-vmCvar_t ui_redteam2;
-vmCvar_t ui_redteam3;
-vmCvar_t ui_redteam4;
-vmCvar_t ui_redteam5;
-vmCvar_t ui_redteam6;
-vmCvar_t ui_redteam7;
 vmCvar_t ui_blueteam;
-vmCvar_t ui_blueteam1;
-vmCvar_t ui_blueteam2;
-vmCvar_t ui_blueteam3;
-vmCvar_t ui_blueteam4;
-vmCvar_t ui_blueteam5;
-vmCvar_t ui_blueteam6;
-vmCvar_t ui_blueteam7;
+vmCvar_t ui_redteamctf1;
+vmCvar_t ui_redteamctf2;
+vmCvar_t ui_redteamctf3;
+vmCvar_t ui_redteamctf4;
+vmCvar_t ui_redteamctf5;
+vmCvar_t ui_redteamctf6;
+vmCvar_t ui_redteamctf7;
+vmCvar_t ui_blueteamctf1;
+vmCvar_t ui_blueteamctf2;
+vmCvar_t ui_blueteamctf3;
+vmCvar_t ui_blueteamctf4;
+vmCvar_t ui_blueteamctf5;
+vmCvar_t ui_blueteamctf6;
+vmCvar_t ui_blueteamctf7;
+vmCvar_t ui_redteamtdm1;
+vmCvar_t ui_redteamtdm2;
+vmCvar_t ui_redteamtdm3;
+vmCvar_t ui_redteamtdm4;
+vmCvar_t ui_redteamtdm5;
+vmCvar_t ui_redteamtdm6;
+vmCvar_t ui_redteamtdm7;
+vmCvar_t ui_blueteamtdm1;
+vmCvar_t ui_blueteamtdm2;
+vmCvar_t ui_blueteamtdm3;
+vmCvar_t ui_blueteamtdm4;
+vmCvar_t ui_blueteamtdm5;
+vmCvar_t ui_blueteamtdm6;
+vmCvar_t ui_blueteamtdm7;
 vmCvar_t ui_notteam1;
 vmCvar_t ui_notteam2;
 vmCvar_t ui_notteam3;
@@ -6842,20 +6938,34 @@ static cvarTable_t cvarTable[] = {
 	{&ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE},
 	{&ui_netGameType, "ui_netGametype", "3", CVAR_ARCHIVE},
 	{&ui_actualNetGameType, "ui_actualNetGametype", "3", CVAR_ARCHIVE},
-	{&ui_redteam1, "ui_redteam1", "0", CVAR_ARCHIVE},
-	{&ui_redteam2, "ui_redteam2", "0", CVAR_ARCHIVE},
-	{&ui_redteam3, "ui_redteam3", "0", CVAR_ARCHIVE},
-	{&ui_redteam4, "ui_redteam4", "0", CVAR_ARCHIVE},
-	{&ui_redteam5, "ui_redteam5", "0", CVAR_ARCHIVE},
-	{&ui_redteam6, "ui_redteam6", "0", CVAR_ARCHIVE},
-	{&ui_redteam7, "ui_redteam7", "0", CVAR_ARCHIVE},
-	{&ui_blueteam1, "ui_blueteam1", "0", CVAR_ARCHIVE},
-	{&ui_blueteam2, "ui_blueteam2", "0", CVAR_ARCHIVE},
-	{&ui_blueteam3, "ui_blueteam3", "0", CVAR_ARCHIVE},
-	{&ui_blueteam4, "ui_blueteam4", "0", CVAR_ARCHIVE},
-	{&ui_blueteam5, "ui_blueteam5", "0", CVAR_ARCHIVE},
-	{&ui_blueteam6, "ui_blueteam6", "0", CVAR_ARCHIVE},
-	{&ui_blueteam7, "ui_blueteam7", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf1, "ui_redteamctf1", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf2, "ui_redteamctf2", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf3, "ui_redteamctf3", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf4, "ui_redteamctf4", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf5, "ui_redteamctf5", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf6, "ui_redteamctf6", "0", CVAR_ARCHIVE},
+	{&ui_redteamctf7, "ui_redteamctf7", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf1, "ui_blueteamctf1", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf2, "ui_blueteamctf2", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf3, "ui_blueteamctf3", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf4, "ui_blueteamctf4", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf5, "ui_blueteamctf5", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf6, "ui_blueteamctf6", "0", CVAR_ARCHIVE},
+	{&ui_blueteamctf7, "ui_blueteamctf7", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm1, "ui_redteamtdm1", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm2, "ui_redteamtdm2", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm3, "ui_redteamtdm3", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm4, "ui_redteamtdm4", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm5, "ui_redteamtdm5", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm6, "ui_redteamtdm6", "0", CVAR_ARCHIVE},
+	{&ui_redteamtdm7, "ui_redteamtdm7", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm1, "ui_blueteamtdm1", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm2, "ui_blueteamtdm2", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm3, "ui_blueteamtdm3", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm4, "ui_blueteamtdm4", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm5, "ui_blueteamtdm5", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm6, "ui_blueteamtdm6", "0", CVAR_ARCHIVE},
+	{&ui_blueteamtdm7, "ui_blueteamtdm7", "0", CVAR_ARCHIVE},
 	{&ui_notteam1, "ui_notteam1", "0", CVAR_ARCHIVE},
 	{&ui_notteam2, "ui_notteam2", "0", CVAR_ARCHIVE},
 	{&ui_notteam3, "ui_notteam3", "0", CVAR_ARCHIVE},
@@ -6871,7 +6981,7 @@ static cvarTable_t cvarTable[] = {
 	{&ui_notteam13, "ui_notteam13", "0", CVAR_ARCHIVE},
 	{&ui_notteam14, "ui_notteam14", "0", CVAR_ARCHIVE},
 	{&ui_netSource, "ui_netSource", "0", CVAR_ARCHIVE},
-	{&ui_menuFiles, "ui_menuFiles", "ui/menus.txt", CVAR_ARCHIVE},
+	{&ui_menuFiles, "ui_menuFiles", "ui/ui1/menus.txt", CVAR_ARCHIVE},
 	{&ui_currentTier, "ui_currentTier", "0", CVAR_ARCHIVE},
 	{&ui_currentMap, "ui_currentMap", "0", CVAR_ARCHIVE},
 	{&ui_currentNetMap, "ui_currentNetMap", "0", CVAR_ARCHIVE},
@@ -6908,14 +7018,18 @@ static cvarTable_t cvarTable[] = {
 	{&ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 	{&ui_findPlayer, "ui_findPlayer", DEFAULT_MODEL, CVAR_ARCHIVE},
 	{&ui_Q3Model, "ui_q3model", "0", CVAR_ARCHIVE},
-	{&ui_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE},
+	{&ui_hudFiles, "cg_hudFiles", "ui/ui1/hud.txt", CVAR_ARCHIVE},
 	{&ui_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},
 	{&ui_teamArenaFirstRun, "ui_teamArenaFirstRun", "0", CVAR_ARCHIVE},
-	{NULL, "g_warmup", "10", CVAR_ARCHIVE},
-	{NULL, "fraglimit", "0", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
-	{NULL, "timelimit", "15", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
-	{NULL, "capturelimit", "8", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
 	{&ui_serverStatusTimeOut, "ui_serverStatusTimeOut", "7000", CVAR_ARCHIVE},
+	{NULL, "g_friendlyFire", "1", CVAR_ARCHIVE},
+	{NULL, "g_allowVote", "1", CVAR_ARCHIVE},
+	{NULL, "g_teamAutoJoin", "1", CVAR_ARCHIVE},
+	{NULL, "g_teamForceBalance", "1", CVAR_ARCHIVE},
+	{NULL, "g_warmup", "10", CVAR_ARCHIVE},
+	{NULL, "timelimit", "15", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
+	{NULL, "fraglimit", "0", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
+	{NULL, "capturelimit", "8", CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART},
 	{NULL, "ui_videomode", "", CVAR_ROM},
 	{NULL, "g_localTeamPref", "", 0},
 };

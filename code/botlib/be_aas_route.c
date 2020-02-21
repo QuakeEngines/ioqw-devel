@@ -148,7 +148,9 @@ AAS_TravelFlagForType_inline
 =======================================================================================================================================
 */
 static ID_INLINE int AAS_TravelFlagForType_inline(int traveltype) {
-	int tfl = 0;
+	int tfl;
+
+	tfl = 0;
 
 	if (traveltype & TRAVELFLAG_NOTTEAM1) {
 		tfl |= TFL_NOTTEAM1;
@@ -423,11 +425,11 @@ void AAS_CreateReversedReachability(void) {
 	aas_reachability_t *reach;
 	aas_areasettings_t *settings;
 	char *ptr;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime;
 
 	starttime = botimport.MilliSeconds();
-#endif // Tobias END
+#endif
 	// free reversed links that have already been created
 	if (aasworld.reversedreachability) {
 		FreeMemory(aasworld.reversedreachability);
@@ -442,7 +444,7 @@ void AAS_CreateReversedReachability(void) {
 		// settings of the area
 		settings = &aasworld.areasettings[i];
 
-		if (settings->numreachableareas >= 128) {
+		if (settings->numreachableareas > 128) {
 			botimport.Print(PRT_WARNING, "area %d has more than 128 reachabilities\n", i);
 		}
 		// create reversed links for the reachabilities
@@ -458,9 +460,9 @@ void AAS_CreateReversedReachability(void) {
 			aasworld.reversedreachability[reach->areanum].numlinks++;
 		}
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "reversed reachability %d msec\n", botimport.MilliSeconds() - starttime);
-#endif // Tobias END
+#endif
 }
 
 /*
@@ -509,11 +511,11 @@ void AAS_CalculateAreaTravelTimes(void) {
 	aas_reversedlink_t *revlink;
 	aas_reachability_t *reach;
 	aas_areasettings_t *settings;
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	int starttime;
 
 	starttime = botimport.MilliSeconds();
-#endif // Tobias END
+#endif
 	// if there are still area travel times, free the memory
 	if (aasworld.areatraveltimes) {
 		FreeMemory(aasworld.areatraveltimes);
@@ -553,9 +555,9 @@ void AAS_CalculateAreaTravelTimes(void) {
 			}
 		}
 	}
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "area travel times %d msec\n", botimport.MilliSeconds() - starttime);
-#endif // Tobias END
+#endif
 }
 
 /*
@@ -1335,8 +1337,8 @@ void AAS_UpdateAreaRoutingCache(aas_routingcache_t *areacache) {
 	unsigned short int t, startareatraveltimes[128]; // NOTE: not more than 128 reachabilities per area allowed
 	aas_routingupdate_t *updateliststart, *updatelistend, *curupdate, *nextupdate;
 	aas_reachability_t *reach;
-	aas_reversedreachability_t *revreach;
-	aas_reversedlink_t *revlink;
+	const aas_reversedreachability_t *revreach; // Tobias NOTE: check other places as well
+	const aas_reversedlink_t *revlink; // Tobias NOTE: check other places as well
 #ifdef ROUTING_DEBUG
 	numareacacheupdates++;
 #endif // ROUTING_DEBUG
@@ -1702,9 +1704,9 @@ int AAS_AreaRouteToGoalArea(int areanum, vec3_t origin, int goalareanum, int tra
 	// NOTE: the number of routing updates is limited per frame
 	/*
 	if (aasworld.frameroutingupdates > MAX_FRAMEROUTINGUPDATES) {
-#ifndef BASEGAME // Tobias DEBUG
+#ifdef DEBUG
 		//Log_Write("WARNING: AAS_AreaTravelTimeToGoalArea: frame routing updates overflowed");
-#endif // Tobias END
+#endif
 		return 0;
 	}
 	*/

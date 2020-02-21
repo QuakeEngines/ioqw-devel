@@ -27,6 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 **************************************************************************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../qcommon/surfaceflags.h" // for CONTENTS_WATER, CONTENTS_LAVA, CONTENTS_SLIME etc.
 #include "l_memory.h"
 #include "l_script.h"
 #include "l_precomp.h"
@@ -84,16 +85,16 @@ void AAS_InitSettings(void) {
 	aassettings.phys_gravity = LibVarValue("phys_gravity", "800");
 	aassettings.phys_waterfriction = LibVarValue("phys_waterfriction", "1");
 	aassettings.phys_watergravity = LibVarValue("phys_watergravity", "400");
-	aassettings.phys_maxvelocity = LibVarValue("phys_maxvelocity", "280");
+	aassettings.phys_maxvelocity = LibVarValue("phys_maxvelocity", "260");
 	aassettings.phys_maxwalkvelocity = LibVarValue("phys_maxwalkvelocity", "280");
 	aassettings.phys_maxcrouchvelocity = LibVarValue("phys_maxcrouchvelocity", "100");
-	aassettings.phys_maxswimvelocity = LibVarValue("phys_maxswimvelocity", "150");
+	aassettings.phys_maxswimvelocity = LibVarValue("phys_maxswimvelocity", "45");
 	aassettings.phys_walkaccelerate = LibVarValue("phys_walkaccelerate", "10");
 	aassettings.phys_airaccelerate = LibVarValue("phys_airaccelerate", "1");
 	aassettings.phys_swimaccelerate = LibVarValue("phys_swimaccelerate", "4");
 	aassettings.phys_maxstep = LibVarValue("phys_maxstep", "19");
 	aassettings.phys_maxsteepness = LibVarValue("phys_maxsteepness", "0.7");
-	aassettings.phys_maxwaterjump = LibVarValue("phys_maxwaterjump", "12");
+	aassettings.phys_maxwaterjump = LibVarValue("phys_maxwaterjump", "20");
 	aassettings.phys_maxbarrier = LibVarValue("phys_maxbarrier", "43");
 	aassettings.phys_jumpvel = LibVarValue("phys_jumpvel", "200");
 	aassettings.phys_falldelta5 = LibVarValue("phys_falldelta5", "40");
@@ -200,6 +201,7 @@ int AAS_OnGround(vec3_t origin, int presencetype, int passent) {
 	aas_trace_t trace;
 	vec3_t end, up = {0, 0, 1};
 	aas_plane_t *plane;
+	float phys_maxsteepness;
 
 	VectorCopy(origin, end);
 
@@ -220,8 +222,9 @@ int AAS_OnGround(vec3_t origin, int presencetype, int passent) {
 	}
 	// check if the plane isn't too steep
 	plane = &trace.plane; //AAS_PlaneFromNum(trace.planenum);
+	phys_maxsteepness = aassettings.phys_maxsteepness;
 
-	if (DotProduct(plane->normal, up) < aassettings.phys_maxsteepness) {
+	if (DotProduct(plane->normal, up) < phys_maxsteepness) {
 		return qfalse;
 	}
 	// the bot is on the ground
@@ -307,7 +310,7 @@ Returns the Z velocity when rocket jumping at the origin.
 */
 float AAS_WeaponJumpZVelocity(vec3_t origin, float radiusdamage) {
 	vec3_t kvel, v, start, end, forward, right, viewangles, dir;
-	float mass, knockback, points;
+	float mass, knockback, points, phys_jumpvel;
 	vec3_t rocketoffset = {8, 8, -8};
 	vec3_t botmins = {-16, -16, -24};
 	vec3_t botmaxs = {16, 16, 56};
@@ -353,7 +356,8 @@ float AAS_WeaponJumpZVelocity(vec3_t origin, float radiusdamage) {
 	// damage velocity
 	VectorScale(dir, 1600.0 * (float)knockback / mass, kvel); // the rocket jump hack...
 	// rocket impact velocity + jump velocity
-	return kvel[2] + aassettings.phys_jumpvel;
+	phys_jumpvel = aassettings.phys_jumpvel;
+	return kvel[2] + phys_jumpvel;
 }
 
 /*
@@ -436,7 +440,7 @@ void AAS_ApplyFriction(vec3_t vel, float friction, float stopspeed, float framet
 AAS_ClipToBBox
 =======================================================================================================================================
 */
-int AAS_ClipToBBox(aas_trace_t *trace, vec3_t start, vec3_t end, int presencetype, vec3_t mins, vec3_t maxs) {
+static qboolean AAS_ClipToBBox(aas_trace_t *trace, const vec3_t start, const vec3_t end, int presencetype, const vec3_t mins, const vec3_t maxs) {
 	int i, j, side;
 	float front, back, frac, planedist;
 	vec3_t bboxmins, bboxmaxs, absmins, absmaxs, dir, mid;
@@ -463,6 +467,10 @@ int AAS_ClipToBBox(aas_trace_t *trace, vec3_t start, vec3_t end, int presencetyp
 	frac = 1;
 
 	for (i = 0; i < 3; i++) {
+		if (fabsf(dir[i]) < 0.001f) { // this may cause denormalization or division by zero
+			//botimport.Print(PRT_MESSAGE, S_COLOR_BLUE "AAS_ClipToBBox: division by zero fix!\n");
+			continue;
+		}
 		// get plane to test collision with for the current axis direction
 		if (dir[i] > 0) {
 			planedist = absmins[i];
@@ -503,11 +511,11 @@ int AAS_ClipToBBox(aas_trace_t *trace, vec3_t start, vec3_t end, int presencetyp
 		trace->startsolid = qfalse;
 		trace->fraction = frac;
 		trace->ent = 0;
-		trace->planenum = 0;
-		// ZTM: TODO: Use the plane of collision
-		trace->plane = aasworld.planes[trace->planenum];
 		trace->area = 0;
 		trace->lastarea = 0;
+		trace->planenum = 0;
+		// ZTM: TODO: use the plane of collision
+		trace->plane = aasworld.planes[trace->planenum];
 		// trace endpos
 		for (j = 0; j < 3; j++) {
 			trace->endpos[j] = start[j] + dir[j] * frac;
@@ -538,12 +546,12 @@ Parameter:	origin			: origin to start with.
 Returns: aas_clientmove_t
 =======================================================================================================================================
 */
-int AAS_ClientMovementPrediction(struct aas_clientmove_s *move, int entnum, vec3_t origin, int presencetype, int onground, vec3_t velocity, vec3_t cmdmove, int cmdframes, int maxframes, float frametime, int stopevent, int stopareanum, vec3_t mins, vec3_t maxs, int visualize) {
+static int AAS_ClientMovementPrediction(aas_clientmove_t *move, int entnum, const vec3_t origin, int presencetype, int onground, const vec3_t velocity, const vec3_t cmdmove, int cmdframes, int maxframes, float frametime, int stopevent, int stopareanum, const vec3_t mins, const vec3_t maxs, int visualize) {
 	float phys_friction, phys_stopspeed, phys_gravity, phys_waterfriction;
 	float phys_watergravity;
 	float phys_walkaccelerate, phys_airaccelerate, phys_swimaccelerate;
 	float phys_maxwalkvelocity, phys_maxcrouchvelocity, phys_maxswimvelocity;
-	float phys_maxstep, phys_maxsteepness, phys_jumpvel, friction;
+	float phys_maxstep, phys_maxsteepness, phys_maxbarrier, phys_jumpvel, friction;
 	float gravity, delta, maxvel, wishspeed, accelerate;
 	//float velchange, newvel;
 	//int ax;
@@ -573,10 +581,11 @@ int AAS_ClientMovementPrediction(struct aas_clientmove_s *move, int entnum, vec3
 	phys_swimaccelerate = aassettings.phys_swimaccelerate;
 	phys_maxstep = aassettings.phys_maxstep;
 	phys_maxsteepness = aassettings.phys_maxsteepness;
+	phys_maxbarrier = aassettings.phys_maxbarrier;
 	phys_jumpvel = aassettings.phys_jumpvel * frametime;
 
-	Com_Memset(move, 0, sizeof(aas_clientmove_t));
-	Com_Memset(&trace, 0, sizeof(aas_trace_t));
+	Com_Memset(move, 0, sizeof(*move));
+	Com_Memset(&trace, 0, sizeof(trace));
 	// start at the current origin
 	VectorCopy(origin, org);
 
@@ -997,12 +1006,12 @@ int AAS_ClientMovementPrediction(struct aas_clientmove_s *move, int entnum, vec3
 
 			VectorCopy(start, end);
 
-			end[2] -= 48 + aassettings.phys_maxbarrier;
+			end[2] -= 48 + phys_maxbarrier;
 			gaptrace = AAS_TraceClientBBox(start, end, PRESENCE_CROUCH, entnum);
 			// if solid is found the bot cannot walk any further and will not fall into a gap
 			if (!gaptrace.startsolid) {
 				// if it is a gap (lower than phys_maxbarrier height)
-				if (gaptrace.endpos[2] < org[2] - aassettings.phys_maxbarrier) {
+				if (gaptrace.endpos[2] < org[2] - phys_maxbarrier) {
 					if (!(AAS_PointContents(end) & CONTENTS_WATER)) {
 						VectorCopy(lastorg, move->endpos);
 						VectorScale(frame_test_vel, 1 / frametime, move->velocity);
